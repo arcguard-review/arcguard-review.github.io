@@ -2113,17 +2113,35 @@ body.agfx-facelift.agfx-page-resources .content-area {
    Compress type and spacing in exactly that band. */
 @media (min-width: 1025px) and (max-width: 1340px) {
   body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     letter-spacing: 0;
   }
 
+  body.agfx-facelift .shfb-header #primary-menu > li {
+    margin-right: 10px !important;
+  }
+
   body.agfx-facelift #primary-menu > li > a {
-    padding-inline: 0.5rem !important;
+    padding-inline: 0.3rem !important;
   }
 
   body.agfx-facelift .shfb-component-button .button {
-    padding: 0.7rem 0.85rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.7rem 0.8rem !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1120px) {
+  body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {
+    font-size: 0.73rem;
+  }
+
+  body.agfx-facelift .shfb-header #primary-menu > li {
+    margin-right: 6px !important;
+  }
+
+  body.agfx-facelift .shfb-header .site-logo {
+    width: 96px !important;
   }
 }
 
