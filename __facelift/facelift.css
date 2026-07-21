@@ -1,0 +1,1661 @@
+/*
+ * Arc Guard local facelift preview
+ * Scope: the existing public WordPress/Elementor DOM after facelift.js adds
+ * `.agfx-facelift`. This layer never replaces or overlays source media.
+ */
+
+body.agfx-facelift {
+  --agfx-ink: #11100f;
+  --agfx-charcoal: #1d1b19;
+  --agfx-steel: #4b4844;
+  --agfx-mist: #d8d0c3;
+  --agfx-cream: #f4efe5;
+  --agfx-cream-deep: #e8dfd0;
+  --agfx-paper: #fffaf1;
+  --agfx-red: #c51f2b;
+  --agfx-red-dark: #981821;
+  --agfx-spark: #e36c2f;
+  --agfx-max: 1280px;
+  --agfx-rule: rgba(17, 16, 15, 0.18);
+  background: var(--agfx-ink) !important;
+  color: var(--agfx-ink);
+  font-family: Montserrat, Arial, sans-serif !important;
+  font-style: normal !important;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+}
+
+body.agfx-facelift,
+body.agfx-facelift * {
+  box-sizing: border-box;
+}
+
+body.agfx-facelift :where(p, li, address, label, input, textarea, select, button, a) {
+  font-family: Montserrat, Arial, sans-serif;
+  font-style: normal;
+}
+
+body.agfx-facelift :where(h1, h2, h3, h4, h5, h6) {
+  margin-block: 0 0.55em;
+  font-family: Montserrat, Arial, sans-serif;
+  font-style: normal;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+body.agfx-facelift :where(p, li) {
+  font-size: clamp(1rem, 0.35vw + 0.94rem, 1.15rem);
+  line-height: 1.72;
+}
+
+body.agfx-facelift a {
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+
+body.agfx-facelift :focus-visible {
+  outline: 3px solid var(--agfx-spark) !important;
+  outline-offset: 4px !important;
+}
+
+body.agfx-facelift .site-content,
+body.agfx-facelift #content,
+body.agfx-facelift .content-area,
+body.agfx-facelift .elementor-location-single,
+body.agfx-facelift .elementor-location-archive {
+  background: var(--agfx-cream);
+}
+
+body.agfx-facelift :where(.elementor, .elementor-section, .elementor-container, .e-con, .e-con-inner, .elementor-widget-wrap, .content-area, .site-main) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Existing media stays in normal document flow and above its own surface only. */
+body.agfx-facelift :where(img, video, iframe, svg, canvas) {
+  display: block;
+  max-width: 100%;
+}
+
+body.agfx-facelift :where(video, iframe, .elementor-widget-video, .elementor-wrapper, #wp-custom-header) {
+  isolation: isolate;
+  z-index: auto !important;
+}
+
+body.agfx-facelift video {
+  width: 100%;
+  height: auto;
+  background: #000;
+}
+
+body.agfx-facelift iframe {
+  border: 0;
+}
+
+body.agfx-facelift .elementor-widget-image img {
+  height: auto !important;
+  object-fit: contain;
+}
+
+/* Header: preserve the existing logo, nav order, social links and destination. */
+body.agfx-facelift :where(.shfb-header.shfb-desktop, .shfb-header.shfb-mobile, #masthead, .site-header) {
+  background: #0b0b0b !important;
+  border-bottom: 1px solid rgba(244, 239, 229, 0.16);
+  box-shadow: none !important;
+}
+
+/* Desktop keeps the theme's own logo sizing (the client approves the PC
+   rendering). Mobile below overrides the theme's 76px shrink. */
+
+/* Mobile header: the newest Arc Guard logo (same file as the desktop header,
+   upper-left on PC) must render at a readable size — it was being shrunk to
+   ~76px on phones, making the mark and tagline illegible. */
+@media (max-width: 1024px) {
+  /* .site-logo is the class on the <img> itself in Sydney's header builder. */
+  body.agfx-facelift .shfb-header :is(img.site-logo, .site-logo img) {
+    width: clamp(120px, 34vw, 150px) !important;
+    max-width: none !important;
+    max-height: none !important;
+    height: auto !important;
+  }
+
+  body.agfx-facelift .shfb-header.shfb-mobile .shfb-main_header_row .shfb-row {
+    align-items: center;
+  }
+
+  body.agfx-facelift .shfb-header.shfb-mobile .site-branding {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {
+  color: var(--agfx-cream) !important;
+  font-size: 0.94rem;
+  font-style: normal !important;
+  font-weight: 620;
+  letter-spacing: 0;
+}
+
+body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button):hover,
+body.agfx-facelift :where(.main-navigation, .shfb-navigation) .current-menu-item > a {
+  color: #fff !important;
+  text-decoration-color: var(--agfx-red);
+  text-decoration-line: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.48em;
+}
+
+body.agfx-facelift :where(header, .shfb-header) a.button,
+body.agfx-facelift :where(header, .shfb-header) .elementor-button {
+  min-height: 46px;
+  padding: 0.85rem 1.25rem !important;
+  border: 1px solid var(--agfx-red) !important;
+  border-radius: 4px !important;
+  background: var(--agfx-red) !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-size: 0.82rem !important;
+  font-style: normal !important;
+  font-weight: 720;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+body.agfx-facelift :where(header, .shfb-header) a.button:hover,
+body.agfx-facelift :where(header, .shfb-header) .elementor-button:hover {
+  border-color: var(--agfx-red-dark) !important;
+  background: var(--agfx-red-dark) !important;
+}
+
+/* Primary button language: the site's original black-to-red gradient with
+   white italic uppercase lettering and a thin white keyline — kept per client. */
+body.agfx-facelift .agfx-button,
+body.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link, input[type="submit"], button[type="submit"]) {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.6rem !important;
+  border: 1px solid #fff !important;
+  border-radius: 3px !important;
+  background: linear-gradient(180deg, #e30808 0%, #c00000 55%, #7a0202 100%) !important;
+  box-shadow: 0 12px 24px -14px rgba(178, 24, 28, 0.65);
+  color: #fff !important;
+  font-size: 0.88rem !important;
+  font-style: italic !important;
+  font-weight: 620 !important;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  transition: filter 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+body.agfx-facelift .agfx-button:hover,
+body.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link, input[type="submit"], button[type="submit"]):hover {
+  filter: brightness(1.25);
+  color: #fff !important;
+}
+
+/* Common Elementor facelift: keep source order and media, improve rhythm. */
+body.agfx-facelift .elementor > :where(.e-con, .elementor-section) {
+  margin-inline: 0;
+}
+
+body.agfx-facelift :where(.elementor-widget-text-editor, .elementor-widget-theme-post-content, .entry-content) p {
+  max-width: 68ch;
+}
+
+body.agfx-facelift :where(.elementor-widget-text-editor, .elementor-widget-heading) :where(p, li, h1, h2, h3, h4) {
+  font-style: normal !important;
+}
+
+body.agfx-facelift .elementor-heading-title {
+  font-style: normal !important;
+}
+
+body.agfx-facelift .elementor-widget-image,
+body.agfx-facelift .elementor-widget-video {
+  margin-block: 0.75rem;
+}
+
+body.agfx-facelift .elementor-widget-image img,
+body.agfx-facelift .elementor-widget-video,
+body.agfx-facelift .elementor-widget-video .elementor-wrapper,
+body.agfx-facelift .wp-video,
+body.agfx-facelift .wp-video video {
+  border-radius: 4px;
+}
+
+body.agfx-facelift .elementor-widget-video .elementor-wrapper {
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 0 1px rgba(17, 16, 15, 0.18);
+}
+
+/* Home: all three source video placements remain untouched and unobstructed. */
+body.agfx-facelift.agfx-page-home #wp-custom-header,
+body.agfx-facelift.agfx-page-home .sydney-hero-area {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+body.agfx-facelift.agfx-page-home #wp-custom-header video {
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  object-fit: contain !important;
+  transform: none !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-14043 > .e-con,
+body.agfx-facelift.agfx-page-home .elementor-14043 > .elementor-section {
+  padding: clamp(4rem, 8vw, 7.5rem) clamp(1.25rem, 6vw, 5rem) !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-8b16c9e,
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 {
+  background-color: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-0067a64 {
+  background-color: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-dc6600f, .elementor-element-c4d87b7, .elementor-element-5f03565) {
+  background-color: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-dc6600f, .elementor-element-c4d87b7, .elementor-element-5f03565) :where(h2, h3, p, li) {
+  color: inherit !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 > .e-con-inner,
+body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 > .elementor-container {
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 .elementor-widget-wrap,
+body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 .e-con {
+  border-top: 2px solid var(--agfx-red);
+}
+
+body.agfx-facelift.agfx-page-home .elementor-14043 .elementor-element-0067a64 :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-14043 .elementor-element-ffcb8a8 :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-14043 .elementor-element-0067a64 :is(h2, h3, h4, h5, h6),
+body.agfx-facelift.agfx-page-home .elementor-14043 .elementor-element-ffcb8a8 :is(h2, h3, h4, h5, h6) {
+  text-align: left !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-14043 .elementor-element-ffcb8a8 :is(h2, h3, h4, h5, h6) {
+  color: var(--agfx-red-dark) !important;
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-269eae5, .elementor-element-8a75246) {
+  width: 100%;
+  margin-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-2f132f4, .elementor-element-35f70ee) {
+  min-height: 0 !important;
+  padding-block: 0 !important;
+  background-color: var(--agfx-ink) !important;
+}
+
+/* Preserve the source carousel, but collapse its dead controls when its loop
+   query has no substantive slide. JS removes this state immediately if a real
+   article/link/media node is added later. The Prevent banner above is untouched. */
+body.agfx-facelift.agfx-page-home .elementor-element-2f132f4.agfx-empty-carousel,
+body.agfx-facelift.agfx-page-home .elementor-element-2f132f4.agfx-empty-carousel .elementor-element-35f70ee,
+body.agfx-facelift.agfx-page-home .elementor-element-2f132f4.agfx-empty-carousel .swiper {
+  block-size: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-2f132f4.agfx-empty-carousel :where(.elementor-swiper-button-prev, .elementor-swiper-button-next, .swiper-pagination) {
+  display: none !important;
+}
+
+/* Product: cream specification field with a real, unobstructed media rail. */
+body.agfx-facelift.agfx-page-product .elementor-401 {
+  background: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f7e8936 {
+  display: block !important;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 5rem) !important;
+  background: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f7e8936 > .e-con-inner {
+  display: grid !important;
+  width: min(100%, var(--agfx-max)) !important;
+  max-width: var(--agfx-max) !important;
+  margin-inline: auto !important;
+  grid-template-columns: minmax(0, 7fr) minmax(280px, 5fr) !important;
+  gap: clamp(2rem, 6vw, 6rem) !important;
+  align-items: center !important;
+}
+
+body.agfx-facelift.agfx-page-product :where(.elementor-element-6b56973, .elementor-element-827191f, .elementor-element-0f4c9b1, .elementor-element-042cedb) {
+  width: 100% !important;
+  max-width: none !important;
+  flex-basis: auto !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f7e8936 :where(h2, h3, p, li) {
+  color: inherit !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f7e8936 h2 {
+  font-size: clamp(2.4rem, 5vw, 5.2rem) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-6b56973 :where(.elementor-widget-text-editor, p) {
+  max-width: 66ch;
+  margin-inline: 0 !important;
+  color: var(--agfx-cream) !important;
+  text-align: left !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-827191f {
+  padding: clamp(1.5rem, 4vw, 3.25rem) !important;
+  border-left: 4px solid var(--agfx-red);
+  background: var(--agfx-paper) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-2f2bff9 img {
+  width: min(100%, 470px) !important;
+  margin-inline: auto;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f0efb4b {
+  display: block !important;
+  padding: clamp(4.5rem, 9vw, 9rem) clamp(1.25rem, 6vw, 5rem) !important;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f0efb4b > .e-con-inner {
+  display: grid !important;
+  width: min(100%, var(--agfx-max)) !important;
+  max-width: var(--agfx-max) !important;
+  margin-inline: auto !important;
+  grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr) !important;
+  gap: clamp(2.5rem, 6vw, 6rem) !important;
+  align-items: start !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-f0efb4b :where(h2, h3, h4, p, li) {
+  color: inherit !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-401 .elementor-element-f0efb4b .elementor-element-0f4c9b1 :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-0f4c9b1 > .elementor-widget-heading:not(:first-child) {
+  margin-top: 1.55rem;
+  padding-top: 1.55rem;
+  border-top: 1px solid var(--agfx-rule);
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-0f4c9b1 h2 {
+  font-size: clamp(2.5rem, 5vw, 5.2rem) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-0f4c9b1 h3 {
+  color: var(--agfx-red-dark) !important;
+  font-size: clamp(1.2rem, 1.6vw, 1.65rem) !important;
+  letter-spacing: -0.015em;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-401 .elementor-element-f0efb4b .elementor-element-0f4c9b1 h6 {
+  color: var(--agfx-red-dark) !important;
+  font-size: clamp(1.1rem, 1.4vw, 1.4rem) !important;
+  letter-spacing: -0.015em;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-042cedb {
+  position: static !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+  padding: clamp(1rem, 2.5vw, 1.75rem) !important;
+  border: 1px solid var(--agfx-rule);
+  background: var(--agfx-paper) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-8587a0e img {
+  width: min(100%, 265px) !important;
+  margin-inline: auto;
+  image-rendering: auto;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-a110975,
+body.agfx-facelift.agfx-page-product .elementor-element-a110975 .elementor-wrapper,
+body.agfx-facelift.agfx-page-product .elementor-element-a110975 iframe {
+  width: 100% !important;
+  aspect-ratio: 16 / 9;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-a110975 {
+  align-self: center !important;
+  margin-inline: auto !important;
+  transform: none !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-a110975 .elementor-wrapper {
+  margin-inline: auto !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-a110975 iframe {
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 {
+  display: grid !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.75rem !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-a8cbd19,
+body.agfx-facelift.agfx-page-product .agfx-document-note {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+}
+
+body.agfx-facelift.agfx-page-product :where(.elementor-element-8837c40, .elementor-element-27d67cc) {
+  padding-inline: clamp(1.25rem, 6vw, 5rem) !important;
+  background: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-8837c40 {
+  padding-top: clamp(4rem, 7vw, 7rem) !important;
+  padding-bottom: 1rem !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-27d67cc {
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: clamp(4rem, 7vw, 7rem) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-27d67cc :where(.e-con-inner, .e-con, .elementor-container) {
+  min-height: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-product :where(.elementor-element-8837c40, .elementor-element-27d67cc) :where(h2, h3, p) {
+  color: inherit !important;
+}
+
+/* Preserve the source Prevent banner while collapsing inherited carousel space. */
+body.agfx-facelift.agfx-page-product .elementor-element-64cf2ab {
+  display: block !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  background: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-64cf2ab .elementor-element-a73ea03,
+body.agfx-facelift.agfx-page-product .elementor-element-64cf2ab .elementor-widget-container {
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-64cf2ab :where(.swiper, .swiper-wrapper, .swiper-slide) {
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-64cf2ab img[src*="Prevent-Banner"] {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Industries: preserve hero/background and every downstream field image. */
+body.agfx-facelift.agfx-page-industries .elementor-556 {
+  width: 100% !important;
+  overflow: visible !important;
+  background: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-element-0301515 {
+  min-height: clamp(430px, 62vw, 720px);
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 5rem) !important;
+  background-position: center !important;
+  background-size: cover !important;
+  color: #fff !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-element-0301515 :where(h2, h3, p) {
+  color: inherit !important;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.68);
+}
+
+body.agfx-facelift.agfx-page-industries :where(.elementor-element-bd2062a, .elementor-element-86aa59e, .elementor-element-d4e4f07, .elementor-element-748a353, .elementor-element-953feb9) {
+  width: 100% !important;
+  max-width: none !important;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 5rem) !important;
+}
+
+body.agfx-facelift.agfx-page-industries :where(.elementor-element-bd2062a, .elementor-element-86aa59e, .elementor-element-748a353) {
+  background-color: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e > .e-con-inner > .e-con {
+  padding: clamp(1rem, 2vw, 1.5rem) !important;
+  border: 1px solid var(--agfx-rule);
+  border-top: 4px solid var(--agfx-red);
+  background: var(--agfx-paper) !important;
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e > .e-con-inner > .e-con :where(.e-con, .elementor-widget) {
+  background-color: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :where(.elementor-element-753f865, .e-753f865-a6bc878) {
+  color: var(--agfx-red-dark) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span),
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-748a353 :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :is(h2, h3, h4, h5, h6),
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-748a353 :is(h2, h3, h4, h5, h6) {
+  color: var(--agfx-red-dark) !important;
+}
+
+body.agfx-facelift.agfx-page-industries :where(.elementor-element-d4e4f07, .elementor-element-953feb9) {
+  background-color: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-industries :where(.elementor-element-d4e4f07, .elementor-element-953feb9) :where(h2, h3, p, li) {
+  color: inherit !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e img,
+body.agfx-facelift.agfx-page-industries :where(.elementor-element-d4e4f07, .elementor-element-748a353, .elementor-element-953feb9) img {
+  width: 100% !important;
+  min-height: 240px;
+  max-height: 520px;
+  object-fit: cover;
+}
+
+/* Resources: keep every current post and image instance. */
+body.agfx-facelift.agfx-page-resources #content {
+  padding: clamp(3.5rem, 7vw, 7rem) clamp(1.25rem, 5vw, 4.5rem);
+  background: var(--agfx-ink);
+}
+
+body.agfx-facelift.agfx-page-resources #primary {
+  width: min(100%, var(--agfx-max)) !important;
+  max-width: var(--agfx-max) !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap {
+  display: block;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row {
+  display: grid !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row {
+  display: grid !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  float: none !important;
+  flex: none !important;
+  grid-column: span 6;
+  margin: 0 !important;
+  padding: clamp(1.4rem, 3vw, 2.25rem) !important;
+  border: 1px solid rgba(244, 239, 229, 0.18);
+  border-top: 4px solid var(--agfx-red);
+  border-radius: 4px;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+  box-shadow: none !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article:first-child {
+  grid-column: span 12;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article :where(.content-inner, .entry-thumb, .post-content, .entry-content, .entry-header) {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article :where(h2, h3, p, a, .entry-meta) {
+  color: inherit;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article img {
+  width: 100%;
+  max-height: 330px;
+  object-fit: contain;
+  background: #fff;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  float: none !important;
+  flex: none !important;
+  grid-column: span 6;
+  margin: 0 !important;
+  padding: clamp(1.4rem, 3vw, 2.25rem) !important;
+  border: 1px solid rgba(244, 239, 229, 0.18);
+  border-top: 4px solid var(--agfx-red);
+  border-radius: 4px;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+  box-shadow: none !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article :where(.content-inner, .entry-thumb, .post-content, .entry-content, .entry-header) {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article:first-of-type {
+  grid-column: span 12;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article :where(h2, h3, p, a, .entry-meta) {
+  color: inherit;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article h2 {
+  font-size: clamp(1.55rem, 2.3vw, 2.5rem);
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article img {
+  width: 100%;
+  max-height: 330px;
+  object-fit: contain;
+  background: #fff;
+}
+
+/* The three posts currently reuse one baked-white logo WebP. Keep every image
+   node and URL, but give the lead story and secondary stories distinct roles so
+   the repeated art reads as deliberate editorial framing, not a page background. */
+body.agfx-facelift.agfx-page-resources #main.post-wrap :where(#post-15765, #post-730, #post-731) .entry-thumb {
+  display: grid !important;
+  width: 100% !important;
+  place-items: center;
+  margin: 0 0 clamp(1rem, 2vw, 1.5rem) !important;
+  padding: clamp(0.75rem, 1.8vw, 1.25rem) !important;
+  overflow: hidden;
+  border: 1px solid var(--agfx-rule);
+  background: var(--agfx-paper) !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap #post-15765 .entry-thumb {
+  block-size: clamp(230px, 24vw, 300px);
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap :where(#post-730, #post-731) .entry-thumb {
+  block-size: clamp(180px, 18vw, 220px);
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap #post-15765 .entry-thumb img {
+  width: min(100%, 760px) !important;
+  max-height: 260px !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap :where(#post-730, #post-731) .entry-thumb img {
+  width: min(100%, 360px) !important;
+  max-height: 180px !important;
+}
+
+body.agfx-facelift.agfx-page-resources #main.post-wrap :where(#post-15765, #post-730, #post-731) .entry-thumb img {
+  display: block;
+  height: auto !important;
+  object-fit: contain;
+}
+
+body.agfx-facelift.agfx-page-resources .sidebar-column,
+body.agfx-facelift.agfx-page-resources #secondary {
+  display: none !important;
+}
+
+/* About: existing story, two logos, mission image, CTA and banner remain. */
+body.agfx-facelift.agfx-page-about .page-header,
+body.agfx-facelift.agfx-page-about .entry-header {
+  width: min(100%, var(--agfx-max));
+  margin-inline: auto;
+  padding: 2rem clamp(1.25rem, 5vw, 4rem);
+  background: var(--agfx-cream);
+}
+
+body.agfx-facelift.agfx-page-about #content {
+  padding-top: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 > :where(.e-con, .elementor-section) {
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 5rem) !important;
+}
+
+body.agfx-facelift.agfx-page-about :where(.elementor-element-03f299e, .elementor-element-44900d0b) {
+  background-color: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 :where(.elementor-element-03f299e, .elementor-element-44900d0b) :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-03f299e :where(.elementor-widget-text-editor, p) {
+  max-width: 64ch;
+  margin-inline: 0 !important;
+  text-align: left !important;
+}
+
+body.agfx-facelift.agfx-page-about :where(.elementor-element-2d3ac6a2, .elementor-element-9bcbf9c) {
+  background-color: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-about :where(.elementor-element-2d3ac6a2, .elementor-element-9bcbf9c) :where(h2, h3, p, li) {
+  color: inherit !important;
+}
+
+body.agfx-facelift.agfx-page-about :where(.elementor-element-03f299e, .elementor-element-2d3ac6a2) img {
+  max-height: 540px;
+  margin-inline: auto;
+  object-fit: contain;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-9bcbf9c,
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-9bcbf9c :where(.e-con, .e-con-inner) {
+  min-height: 0 !important;
+  background: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-9bcbf9c {
+  padding-block: 2.5rem !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-9bcbf9c img {
+  width: min(100%, 240px) !important;
+  margin-inline: auto;
+  padding: 1.25rem;
+  border-left: 4px solid var(--agfx-red);
+  background: var(--agfx-paper);
+}
+
+/* Contact: preserve logo, data, socials, map, CTA and banner. */
+body.agfx-facelift.agfx-page-contact .elementor-553 {
+  background: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-contact :where(.elementor-element-898bff1, .elementor-element-0618a07) {
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 5rem) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 {
+  background: var(--agfx-ink) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-898bff1 :where(.e-con, .e-con-inner) {
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-898bff1 .elementor-widget-image {
+  padding: clamp(1.5rem, 4vw, 3rem) !important;
+  border-left: 4px solid var(--agfx-red);
+  background: var(--agfx-paper) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 :where(h2, h3, p, li) {
+  color: inherit !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-0618a07 {
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-0618a07::before {
+  content: none !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-0618a07,
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-0618a07 :where(.e-con, .e-con-inner) {
+  background: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-46d116f,
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-46d116f :where(.e-con, .e-con-inner) {
+  background: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-0618a07 :is(h1, h2, h3, h4, h5, h6, p, a, address, span) {
+  color: var(--agfx-ink) !important;
+}
+
+body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5) {
+  width: 100% !important;
+  min-height: 420px;
+  background: var(--agfx-charcoal) !important;
+}
+
+body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5) iframe {
+  width: 100% !important;
+  min-height: 420px !important;
+}
+
+/* Footer and preserved Prevent banner. */
+body.agfx-facelift #colophon,
+body.agfx-facelift .shfb-footer {
+  background: #0b0b0b !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift :where(#colophon, .shfb-footer) :where(h2, h3, h4, p, li, a) {
+  color: inherit !important;
+  font-style: normal !important;
+}
+
+body.agfx-facelift img[src*="Prevent-Banner"] {
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* Restrained progressive reveals; source content remains visible without JS. */
+body.agfx-facelift.agfx-motion-ready .agfx-reveal:not(.is-visible) {
+  opacity: 1;
+  transform: translateY(8px);
+}
+
+body.agfx-facelift .agfx-reveal {
+  opacity: 1;
+  transform: none;
+  transition: opacity 480ms ease, transform 580ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+@media (max-width: 1024px) {
+  body.agfx-facelift.agfx-page-product .elementor-element-f7e8936 > .e-con-inner,
+  body.agfx-facelift.agfx-page-product .elementor-element-f0efb4b > .e-con-inner {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.agfx-facelift.agfx-page-product .elementor-element-827191f {
+    width: 100%;
+    border-top: 4px solid var(--agfx-red);
+    border-left: 0;
+  }
+
+  body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article,
+  body.agfx-facelift.agfx-page-resources #main.post-wrap > .row > article:first-of-type,
+  body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article,
+  body.agfx-facelift.agfx-page-resources #main.post-wrap .posts-layout > .row > article:first-child {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 767px) {
+  body.agfx-facelift {
+    font-size: 16px;
+  }
+
+  body.agfx-facelift :where(.elementor, .elementor-section, .elementor-container, .e-con, .e-con-inner, .elementor-widget-wrap, .elementor-widget, .content-area, .site-main) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    inset-inline: auto !important;
+  }
+
+  body.agfx-facelift .agfx-actions,
+  body.agfx-facelift .agfx-button,
+  body.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link) {
+    width: 100%;
+  }
+
+  body.agfx-facelift.agfx-page-home #wp-custom-header video {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.agfx-facelift.agfx-page-product .elementor-element-8587a0e img {
+    width: min(100%, 265px) !important;
+  }
+
+  body.agfx-facelift.agfx-page-resources #main.post-wrap #post-15765 .entry-thumb {
+    block-size: 210px;
+  }
+
+  body.agfx-facelift.agfx-page-resources #main.post-wrap :where(#post-730, #post-731) .entry-thumb {
+    block-size: 180px;
+  }
+
+  body.agfx-facelift.agfx-page-industries :where(.elementor-element-0301515, .elementor-element-bd2062a, .elementor-element-86aa59e, .elementor-element-d4e4f07, .elementor-element-748a353, .elementor-element-953feb9) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    transform: none !important;
+  }
+
+  body.agfx-facelift.agfx-page-industries .elementor-556 .e-15b7209-0a94cf0 {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+    transform: none !important;
+  }
+
+  body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e img,
+  body.agfx-facelift.agfx-page-industries :where(.elementor-element-d4e4f07, .elementor-element-748a353, .elementor-element-953feb9) img {
+    display: block !important;
+    width: 100% !important;
+    min-height: 200px;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Keep the live Contact logo and copy, but give each a full-width reading zone. */
+  body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 > :where(.e-con, .e-con-inner),
+  body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 :where(.elementor-element-a7bc327, .elementor-element-2ef30fd, .elementor-element-49cdf40) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 .elementor-element-4bba9d1 {
+    width: min(100%, 290px) !important;
+    margin-inline: auto !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5),
+  body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5) iframe {
+    min-height: 320px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.agfx-facelift *,
+  body.agfx-facelift *::before,
+  body.agfx-facelift *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  body.agfx-facelift .agfx-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* The product document buttons sit in a column whose width varies with the
+   window; side-by-side layouts break at many in-between sizes. Stack and
+   center them at every width — no breakpoint edge cases. */
+body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 {
+  grid-template-columns: 1fr !important;
+  justify-items: center;
+  row-gap: 0.85rem;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 :where(.elementor-button, .roll-button) {
+  width: min(100%, 420px);
+  text-align: center;
+}
+
+/* Header CTA — stop the two-line wrap and center the label. */
+body.agfx-facelift .shfb-component-button .button,
+body.agfx-facelift .shfb-component-button2 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0.7rem 1.35rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+/* Footer — the original WordPress footer content only (no injected columns),
+   centered and aligned consistently at every width. */
+body.agfx-facelift #colophon.agfx-footer {
+  border-top: 4px solid var(--agfx-red);
+  background: #0d0c0b !important;
+}
+
+body.agfx-facelift #colophon.agfx-footer .shfb-main_footer_row .container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(2.25rem, 5vw, 3.25rem) clamp(1.25rem, 4vw, 2rem) clamp(1.5rem, 4vw, 2.25rem);
+}
+
+body.agfx-facelift #colophon.agfx-footer .shfb-main_footer_row .shfb-row {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+}
+
+body.agfx-facelift #colophon.agfx-footer .shfb-column:empty,
+body.agfx-facelift #colophon.agfx-footer .agfx-footer-col-empty {
+  display: none;
+}
+
+body.agfx-facelift #colophon.agfx-footer .footer-widget,
+body.agfx-facelift #colophon.agfx-footer .footer-widget aside {
+  margin: 0;
+  padding: 0;
+}
+
+body.agfx-facelift #colophon.agfx-footer .widget-title {
+  margin: 0 0 1.1rem;
+  color: var(--agfx-cream);
+  font-size: 0.82rem;
+  font-weight: 760;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+body.agfx-facelift #colophon.agfx-footer .widget-title::after {
+  content: '';
+  display: block;
+  width: 34px;
+  height: 3px;
+  margin: 0.6rem auto 0;
+  background: var(--agfx-red);
+}
+
+body.agfx-facelift #colophon.agfx-footer ul#menu-footer-1 {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 2.25rem;
+}
+
+body.agfx-facelift #colophon.agfx-footer ul#menu-footer-1 li {
+  margin: 0;
+  padding: 0;
+}
+
+body.agfx-facelift #colophon.agfx-footer ul#menu-footer-1 a {
+  display: inline-block;
+  color: var(--agfx-mist);
+  font-size: 0.95rem;
+  font-weight: 560;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+body.agfx-facelift #colophon.agfx-footer ul#menu-footer-1 a:hover {
+  color: var(--agfx-cream);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--agfx-red);
+}
+
+body.agfx-facelift #colophon.agfx-footer .shfb-below_footer_row {
+  border-top: 1px solid rgba(244, 239, 229, 0.14);
+}
+
+body.agfx-facelift #colophon.agfx-footer .shfb-below_footer_row .container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 1.1rem clamp(1.25rem, 4vw, 2rem);
+}
+
+body.agfx-facelift #colophon.agfx-footer .shfb-below_footer_row .shfb-row {
+  display: flex !important;
+  justify-content: center;
+}
+
+/* Empty footer widgets (blank paragraph blocks) add phantom height. */
+body.agfx-facelift #colophon.agfx-footer .footer-widget aside:not(:has(a, img, li)) {
+  display: none;
+}
+
+body.agfx-facelift #colophon.agfx-footer .sydney-credits {
+  color: rgba(244, 239, 229, 0.55);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  body.agfx-facelift #colophon.agfx-footer ul#menu-footer-1 {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+  }
+}
+
+/* About page composition — balanced editorial layouts instead of stacked columns. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-03f299e {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  column-gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: center;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-03f299e > * {
+  min-width: 0;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-762c5d8 h3 {
+  font-size: clamp(1.85rem, 3vw, 2.5rem) !important;
+  line-height: 1.12;
+  margin-bottom: 0.4rem !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-762c5d8 h3::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-top: 0.85rem;
+  background: var(--agfx-red);
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-4d5ca29 p {
+  font-size: 1.03rem !important;
+  line-height: 1.75 !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-afb0a74 img {
+  width: min(100%, 420px) !important;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: var(--agfx-paper);
+  border: 1px solid var(--agfx-rule);
+  border-left: 4px solid var(--agfx-red);
+  box-shadow: 0 30px 60px -42px rgba(0, 0, 0, 0.45);
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  column-gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: center;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-2d3ac6a2 > * {
+  min-width: 0;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-174785ce {
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
+  font-size: clamp(1.85rem, 3vw, 2.5rem) !important;
+  line-height: 1.12;
+  text-align: left !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-top: 0.85rem;
+  background: var(--agfx-red);
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-5585eab5 p {
+  max-width: 54ch;
+  font-size: 1.03rem !important;
+  line-height: 1.75 !important;
+  text-align: left !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-351d0abe {
+  display: grid !important;
+  gap: 1.5rem;
+  justify-items: center;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-170b8875 img {
+  width: min(100%, 480px) !important;
+  box-shadow: 0 30px 60px -42px rgba(0, 0, 0, 0.65);
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-0fde769 img {
+  width: min(100%, 300px) !important;
+  padding: 1.25rem;
+  background: var(--agfx-paper);
+  border-left: 4px solid var(--agfx-red);
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b {
+  padding-block: clamp(3.5rem, 7vw, 5.5rem) !important;
+  text-align: center;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-4c9f8f4a h2,
+body.agfx-facelift.agfx-page-about .elementor-element-4c9f8f4a h3 {
+  max-width: 20ch;
+  margin-inline: auto !important;
+  font-size: clamp(2rem, 4vw, 3.1rem) !important;
+  line-height: 1.08;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-37179017 {
+  margin-top: 1.25rem !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-253bda3 {
+  margin-top: clamp(2.5rem, 5vw, 4rem) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-253bda3 img {
+  width: min(100%, 900px) !important;
+  margin-inline: auto;
+  box-shadow: 0 34px 70px -48px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 900px) {
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-03f299e,
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 {
+    grid-template-columns: 1fr !important;
+    row-gap: 2.25rem;
+  }
+
+  body.agfx-facelift.agfx-page-about .elementor-element-afb0a74 img {
+    margin-inline: auto;
+  }
+}
+
+/* Smooth-like-butter pass: gentle lift on primary actions. */
+body.agfx-facelift .agfx-button:hover,
+body.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -14px rgba(178, 24, 28, 0.55);
+}
+
+body.agfx-facelift .agfx-button:active,
+body.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link):active {
+  transform: translateY(0);
+}
+
+/* Elementor per-widget --width percentages compound inside the grid layout
+   and shrink content to slivers — normalize them to full track width. */
+body.agfx-facelift.agfx-page-about :where(
+  .elementor-element-6bfdeec, .elementor-element-4d5ca29, .elementor-element-762c5d8,
+  .elementor-element-ac254c0, .elementor-element-afb0a74,
+  .elementor-element-174785ce, .elementor-element-adce7d2, .elementor-element-5585eab5,
+  .elementor-element-351d0abe, .elementor-element-170b8875, .elementor-element-0fde769) {
+  --width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* About renders in the theme's sidebar layout (col-md-9) but no sidebar
+   exists — reclaim the full content width. */
+body.agfx-facelift.agfx-page-about .content-area {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100%;
+}
+
+/* Specificity-boosted --width normalization (Elementor's generated rule is
+   .elementor-14346 .elementor-element.elementor-element-XXX at 3 classes). */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element:where(
+  .elementor-element-6bfdeec, .elementor-element-4d5ca29, .elementor-element-762c5d8,
+  .elementor-element-ac254c0, .elementor-element-afb0a74,
+  .elementor-element-174785ce, .elementor-element-adce7d2, .elementor-element-5585eab5,
+  .elementor-element-351d0abe, .elementor-element-170b8875, .elementor-element-0fde769) {
+  --width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Red action buttons must always read white — fixes black-text regression. */
+body.agfx-facelift .agfx-button,
+body.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link):not(.agfx-button--secondary) {
+  color: #fff !important;
+}
+
+/* Button label spans inherit ink from section text rules at higher
+   specificity — force primary button text white (repeated class = max wins). */
+body.agfx-facelift.agfx-facelift.agfx-facelift.agfx-facelift.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link, .agfx-button):not(.agfx-button--secondary),
+body.agfx-facelift.agfx-facelift.agfx-facelift.agfx-facelift.agfx-facelift :where(.elementor-button, .roll-button, .wp-block-button__link, .agfx-button):not(.agfx-button--secondary) :where(span, .elementor-button-text, .elementor-button-content-wrapper, i) {
+  color: #fff !important;
+}
+
+/* Header CTA joins the primary button family: gradient, white italic label,
+   magnet hover (class added in JS), brightness lift. */
+body.agfx-facelift .shfb-component-button .button,
+body.agfx-facelift .shfb-component-button2 .button {
+  border: 1px solid #fff !important;
+  border-radius: 3px !important;
+  background: linear-gradient(180deg, #e30808 0%, #c00000 55%, #7a0202 100%) !important;
+  box-shadow: 0 12px 24px -14px rgba(178, 24, 28, 0.65);
+  color: #fff !important;
+  font-style: italic !important;
+  font-weight: 620 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.09em;
+  transition: filter 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+body.agfx-facelift .shfb-component-button .button:hover,
+body.agfx-facelift .shfb-component-button2 .button:hover {
+  filter: brightness(1.25);
+  color: #fff !important;
+}
+
+/* Home CTA columns: Elementor atomic columns collapse to 20px and let the
+   heading spill over the partner-logos image at mid widths. Give the section
+   real flow at every width. */
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 {
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  gap: 2.5rem;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 > .e-con {
+  flex: 1 1 440px !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-e231a56, .elementor-element-77cb5f6),
+body.agfx-facelift.agfx-page-home :where(.elementor-element-e231a56, .elementor-element-77cb5f6) * {
+  max-width: 100% !important;
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-e231a56, .elementor-element-77cb5f6) img {
+  height: auto !important;
+}
+
+/* Live-theme safety: never let fixed-width containers or injected sections
+   push past the viewport (the Sydney .container is fixed 1170px and the real
+   theme shifts it at some window sizes). */
+body.agfx-facelift .content-wrapper.container {
+  width: min(1170px, 100%) !important;
+  margin-inline: auto !important;
+}
+
+body.agfx-facelift {
+  overflow-x: clip;
+}
+
+/* ===== Full-bleed: kill the boxed 1170px container on facelifted pages so
+   dark sections run edge-to-edge. Sections keep their own inner padding. ===== */
+body.agfx-facelift .content-wrapper.container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+body.agfx-facelift .content-wrapper > .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+body.agfx-facelift .content-area {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+body.agfx-facelift #content,
+body.agfx-facelift .page-wrap {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Keep readable gutters inside the resources post grid now that its
+   container is full width. */
+body.agfx-facelift.agfx-page-resources #main.post-wrap {
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+/* ===== Homepage CTA columns: matched image sizes, aligned text and buttons. ===== */
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 {
+  align-items: stretch !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 > .e-con {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+body.agfx-facelift.agfx-page-home :where(.elementor-element-e231a56, .elementor-element-77cb5f6) img {
+  width: 100% !important;
+  height: clamp(240px, 22vw, 330px) !important;
+  margin-bottom: 1.25rem;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-e231a56 img {
+  object-fit: cover;
+  object-position: center;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-77cb5f6 img {
+  object-fit: contain;
+  background: #fff;
+  padding: 1.25rem;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 > .e-con > :last-child {
+  margin-top: auto;
+}
+
+/* Product documents group centered under the assembly demo. */
+body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 {
+  justify-content: center;
+  text-align: center;
+  margin-inline: auto !important;
+}
+
+/* Full-bleed sections: Elementor boxes top-level containers to 1140px inside
+   a full-width cream wrapper — stretch them so dark sections run edge to edge. */
+body.agfx-facelift .elementor > .e-con,
+body.agfx-facelift .elementor > .elementor-section,
+body.agfx-facelift .elementor > .e-con > .e-con-inner,
+body.agfx-facelift .elementor > .elementor-section > .elementor-container {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ===== Mobile fixes (client-reported flaws) ===== */
+
+/* Mobile readability + touch targets: the theme renders blog meta at 12px and
+   "Read more" as a small text link on phones. Styling only — no copy changes. */
+@media (max-width: 767px) {
+  body.agfx-facelift.agfx-page-resources .entry-meta,
+  body.agfx-facelift.agfx-page-resources .entry-meta a {
+    font-size: 0.85rem !important;
+    line-height: 1.5;
+  }
+
+  body.agfx-facelift.agfx-page-resources a.read-more {
+    display: inline-block;
+    padding: 0.6rem 0.25rem;
+  }
+
+  body.agfx-facelift.agfx-page-contact :where(.elementor-element-818aab8, .elementor-element-20d4ef8, .elementor-element-35a33ae) .elementor-heading-title {
+    font-size: 0.85rem !important;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* Touch devices: reveal/split-text motion can freeze mid-state on iOS —
+   force everything fully visible regardless of body motion state. */
+@media (hover: none), (pointer: coarse) {
+  body.agfx-facelift .agfx-reveal,
+  body.agfx-facelift.agfx-motion-ready .agfx-reveal:not(.is-visible) {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Home CTA columns: kill stray Elementor offsets, align everything left,
+     tighten the rhythm, keep imagery compact. */
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 {
+    gap: 2.25rem;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 :where(.elementor-widget-heading, .elementor-widget-text-editor, h2, h3, p) {
+    margin: 0 0 0.85rem !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    text-align: left !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 img {
+    height: 210px !important;
+    margin-bottom: 1rem;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-77cb5f6 img {
+    padding: 0.85rem;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .agfx-button,
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 :where(.elementor-button, .roll-button) {
+    width: 100%;
+  }
+
+  /* Industries cards: collapse desktop min-heights and loosen-spacing so the
+     cards read as one tight block. */
+  body.agfx-facelift.agfx-page-industries .e-con,
+  body.agfx-facelift.agfx-page-industries .e-con-inner {
+    min-height: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-industries :where(h2, h3, h4) {
+    margin-block: 0.6rem !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  body.agfx-facelift.agfx-page-industries :where(.elementor-widget-heading, .elementor-widget-text-editor) {
+    margin-block: 0.4rem !important;
+  }
+}
+
+@media (max-width: 767px) {
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .elementor-widget {
+    --width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Home CTA on mobile: Elementor atomic paragraphs/headings self-center at
+   intrinsic width — stretch and left-align them. */
+@media (max-width: 767px) {
+  body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .e-con > :where(p, h2, h3, .e-paragraph-base, .e-heading-base) {
+    width: 100% !important;
+    max-width: 100% !important;
+    align-self: stretch !important;
+    margin: 0 0 0.85rem !important;
+    text-align: left !important;
+  }
+}
+
+/* About (adversarial finding): the theme's sidebar layout pads post-wrap 30px
+   on the right at >=992px, leaving a cream strip beside dark sections. */
+body.agfx-facelift.agfx-page-about #main.post-wrap,
+body.agfx-facelift.agfx-page-about .post-wrap {
+  padding: 0 !important;
+}
+
+/* About: center the black banner image instead of hugging the left edge. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa {
+  justify-content: center !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-23097aa img {
+  margin-inline: auto !important;
+}
