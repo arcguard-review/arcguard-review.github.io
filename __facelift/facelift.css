@@ -149,7 +149,7 @@ body.agfx-facelift :where(.shfb-header.shfb-desktop, .shfb-header.shfb-mobile, #
     font-size: 0.78rem;
     font-style: italic;
     font-weight: 620;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.04em;
     text-decoration: none;
     text-transform: uppercase;
   }
@@ -2234,4 +2234,59 @@ body.agfx-facelift .agfx-unmute {
     max-width: 100% !important;
     margin: 0 !important;
   }
+}
+
+/* Mobile "Schedule a Consult" bar under the header row — both top actions
+   (FAQ pill + consult) visible on phones, per Corban 2026-07-21. */
+@media (max-width: 1024px) {
+  body.agfx-facelift .shfb-header.shfb-mobile .agfx-mobile-ctabar {
+    padding: 0 0.85rem 0.7rem;
+  }
+
+  body.agfx-facelift .agfx-mobile-ctabar .agfx-button {
+    display: block;
+    width: 100%;
+    padding: 0.62rem 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em !important;
+    word-spacing: normal !important;
+  }
+}
+
+/* "For Safety, Operations & Maintenance" on ONE line on phones, with tighter
+   word spacing (Corban's annotated screenshot). */
+@media (max-width: 767px) {
+  body.agfx-facelift.agfx-page-home h3[data-id="18ebef7"],
+  body.agfx-facelift.agfx-page-home h3[data-id="4ba2310"] {
+    max-width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    white-space: nowrap;
+    font-size: clamp(12px, 3.9vw, 1.9rem) !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.01em !important;
+    word-spacing: normal !important;
+  }
+}
+
+/* Client 2026-07-21: "take off one of the how it works" — the generic
+   eyebrow duplicates the booklet's own "HOW ARC GUARD™ WORKS" title right
+   below it. Hidden here; Corban should delete the widget in WordPress. */
+body.agfx-facelift.agfx-page-home .elementor-element-94beee6 {
+  display: none !important;
+}
+
+/* Industries cards: the icon-box title widgets carry a fixed Elementor
+   height, leaving ~100px of dead space above "Hazard(s):" — let them size to
+   their content and tighten the rhythm. */
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-widget-icon-box {
+  height: auto !important;
+  min-height: 0 !important;
+  padding-top: 8px !important;
+  padding-bottom: 12px !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-icon-box-description {
+  margin-bottom: 0.35rem;
 }

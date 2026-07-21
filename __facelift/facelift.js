@@ -264,7 +264,21 @@
   // FAQ access (explicit directive 2026-07-21: the FAQ must be reachable on
   // mobile, homepage included). Label and destination are Arc Guard's own —
   // the client's FAQ PDF that the native Product-page button links to.
-  const FAQ_PDF = 'https://www.arcguardinc.com/wp-content/uploads/2026/06/ArcGuard_FAQ-3.pdf';
+  // Off production, links point at the corrected copy (patented + patent
+  // number, per Corban's order); on production the corrected PDF must replace
+  // the media-library file at go-live (runbook step).
+  const ON_PRODUCTION = /(^|\.)arcguardinc\.com$/i.test(window.location.hostname);
+  const FAQ_PDF = ON_PRODUCTION
+    ? 'https://www.arcguardinc.com/wp-content/uploads/2026/06/ArcGuard_FAQ-3.pdf'
+    : siteHref('/docs/ArcGuard_FAQ_Patented.pdf');
+
+  const retargetFaqDocumentLinks = () => {
+    if (ON_PRODUCTION) return;
+    for (const anchor of document.querySelectorAll('a[href*="ArcGuard_FAQ"]')) {
+      anchor.setAttribute('href', FAQ_PDF);
+    }
+  };
+
   const injectFaqAccess = () => {
     const menus = document.querySelectorAll(
       'ul#primary-menu, .sydney-offcanvas-menu ul.menu, .sydney-offcanvas-menu ul.sydney-dropdown-ul'
@@ -302,8 +316,20 @@
     for (const menu of document.querySelectorAll('.sydney-offcanvas-menu ul.menu, .sydney-offcanvas-menu ul.sydney-dropdown-ul')) {
       if (menu.closest('li') || menu.querySelector('.agfx-offcanvas-consult')) continue;
       const item = document.createElement('li');
-      item.innerHTML = `<a class="agfx-button agfx-offcanvas-consult" href="https://calendly.com/m-moran-arcguardinc/30min">Schedule a Consult</a>`;
+      item.innerHTML = `<a class="agfx-button agfx-offcanvas-consult" href="${CALENDLY_URL}">Schedule a Consult</a>`;
       menu.prepend(item);
+    }
+
+    // Corban 2026-07-21: both buttons visible at the top on phones — FAQ
+    // stays as a pill, Schedule a Consult gets a slim bar under the header
+    // row (sticks with the sticky header).
+    const mobileHeader = document.querySelector('.shfb-header.shfb-mobile');
+    const mainRow = mobileHeader?.querySelector('.shfb-row-wrapper.shfb-main_header_row');
+    if (mainRow && !mobileHeader.querySelector('.agfx-mobile-ctabar')) {
+      const bar = document.createElement('div');
+      bar.className = 'agfx-mobile-ctabar';
+      bar.innerHTML = `<a class="agfx-button" href="${CALENDLY_URL}">Schedule a Consult</a>`;
+      mainRow.after(bar);
     }
   };
 
@@ -733,6 +759,7 @@
   improveMediaSemantics();
   manageHomeEmptyCarousel();
   improveLinksAndActions();
+  retargetFaqDocumentLinks();
   injectFaqAccess();
   injectAssessmentBand();
   injectAssessment();
