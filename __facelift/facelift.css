@@ -129,6 +129,30 @@ body.agfx-facelift :where(.shfb-header.shfb-desktop, .shfb-header.shfb-mobile, #
     display: flex;
     justify-content: center;
   }
+
+  /* Always-visible FAQ pill in the mobile header (client's own FAQ PDF). */
+  body.agfx-facelift .shfb-header.shfb-mobile .shfb-main_header_row .shfb-column-3 {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.55rem;
+  }
+
+  body.agfx-facelift .agfx-mobile-faq {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.7rem;
+    border: 1px solid #fff;
+    border-radius: 3px;
+    background: linear-gradient(rgb(0, 0, 0) 0%, rgb(204, 0, 0) 100%);
+    color: #fff !important;
+    font-size: 0.78rem;
+    font-style: italic;
+    font-weight: 620;
+    letter-spacing: 0.09em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
 }
 
 body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {

@@ -23,23 +23,6 @@
     '/contact/': 'contact'
   };
 
-  const ALT_TEXT_BY_FRAGMENT = [
-    ['Product-Image-1', 'Red Arc Guard locking sleeve and spring-assisted welding connector cover'],
-    ['TM-Vector-LOGO-with-Phrase', 'Arc Guard logo with “No Arc. No Drop. No Excuse.”'],
-    ['generated-image-7', 'Arc Guard company logo'],
-    ['ArcGuard-logo-white-bg', 'Arc Guard logo'],
-    ['welder-background-1', 'Welder working with industrial welding leads'],
-    ['ed-boilermaker-confined-space-1', 'Boilermaker welding in a confined industrial work area'],
-    ['elevated-welding', 'Welder working from an elevated structural-steel position'],
-    ['small-space-welding', 'Welder working in a restricted fabrication space'],
-    ['alain-pham-P_qvsF7Yodw', 'Oil and gas industrial infrastructure'],
-    ['SS-pot-fab', 'Stainless-steel fabrication work'],
-    ['CS-nozzle-backweld', 'Industrial manufacturing weld preparation'],
-    ['safety-slogan', 'Arc Guard field-safety message'],
-    ['partner_logos', 'Arc Guard partner and industry logos'],
-    ['Prevent-Banner', 'Arc Guard safety-message banner']
-  ];
-
   const normalizePath = pathname => {
     if (pathname === '/') return pathname;
     return pathname.endsWith('/') ? pathname : `${pathname}/`;
@@ -143,31 +126,23 @@
     }
   };
 
-  const addAltText = () => {
-    for (const image of document.querySelectorAll('img')) {
-      if ((image.getAttribute('alt') || '').trim()) continue;
-      const source = sourceAttribute(image);
-      const mapping = ALT_TEXT_BY_FRAGMENT.find(([fragment]) => source.includes(fragment));
-      image.alt = mapping ? mapping[1] : 'Arc Guard welding connector safety information';
-    }
-  };
-
+  // Presentation roles only (sizing hooks for CSS) — no authored alt text; per
+  // the client mandate, wording (even alt/aria) must come from Arc Guard.
   const refineResourcePostImages = () => {
     if (pageKey !== 'resources') return;
 
     const specifications = [
-      ['post-15765', 'lead', 'Arc Guard logo for ignition risk at welding connectors'],
-      ['post-730', 'compact', 'Arc Guard logo for welding connector spark safety'],
-      ['post-731', 'compact', 'Arc Guard logo for hot-connector equipment cost']
+      ['post-15765', 'lead'],
+      ['post-730', 'compact'],
+      ['post-731', 'compact']
     ];
 
-    for (const [postId, role, alt] of specifications) {
+    for (const [postId, role] of specifications) {
       const article = document.getElementById(postId);
       const image = article?.querySelector('.entry-thumb img');
       if (!article || !image) continue;
       article.dataset.agfxResourceRole = role;
       image.dataset.agfxResourceRole = role;
-      image.alt = alt;
     }
   };
 
@@ -218,24 +193,30 @@
   };
 
   const improveMediaSemantics = () => {
-    const videos = [...document.querySelectorAll('video')];
-    videos.forEach((video, index) => {
-      video.preload = 'metadata';
-      if (!video.getAttribute('aria-label')) {
-        video.setAttribute(
-          'aria-label',
-          index === 0 && pageKey === 'home'
-            ? 'Arc Guard brand film'
-            : 'Arc Guard product field presentation'
-        );
-      }
-    });
-
-    for (const iframe of document.querySelectorAll('iframe')) {
-      const src = sourceAttribute(iframe);
-      if (/vimeo\.com/i.test(src) && !iframe.title) iframe.title = 'Arc Guard Assembly Demo';
-      if (/google\.com\/maps/i.test(src) && !iframe.title) {
-        iframe.title = 'Arc Guard office location in Baton Rouge, Louisiana';
+    // On phones the Elementor presentation video renders as a black tap-to-play
+    // frame (no poster, no playsinline). Client request 2026-07-21: it must
+    // autoplay muted and seamless on mobile. Touch devices get background-film
+    // behavior; desktop keeps the native controls (viewers can unmute there).
+    const touchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    for (const video of document.querySelectorAll('video.elementor-video, .elementor-widget-video video')) {
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+      if (touchDevice) {
+        video.muted = true;
+        video.defaultMuted = true;
+        video.setAttribute('muted', '');
+        video.autoplay = true;
+        video.loop = true;
+        video.removeAttribute('controls');
+        video.controls = false;
+        video.preload = 'auto';
+        const tryPlay = () => video.play().catch(() => {});
+        tryPlay();
+        if ('IntersectionObserver' in window) {
+          new IntersectionObserver(entries => {
+            for (const entry of entries) if (entry.isIntersecting) tryPlay();
+          }, { threshold: 0.2 }).observe(video);
+        }
       }
     }
   };
@@ -257,6 +238,43 @@
           '<a href="mailto:J.Crumholt@ArcGuardInc.com">J.Crumholt@ArcGuardInc.com</a>'
         );
       }
+    }
+  };
+
+  // FAQ access (explicit directive 2026-07-21: the FAQ must be reachable on
+  // mobile, homepage included). Label and destination are Arc Guard's own —
+  // the client's FAQ PDF that the native Product-page button links to.
+  const FAQ_PDF = 'https://www.arcguardinc.com/wp-content/uploads/2026/06/ArcGuard_FAQ-3.pdf';
+  const injectFaqAccess = () => {
+    const menus = document.querySelectorAll(
+      'ul#primary-menu, .sydney-offcanvas-menu ul.menu, .sydney-offcanvas-menu ul.sydney-dropdown-ul'
+    );
+    for (const menu of menus) {
+      if (menu.querySelector('.agfx-nav-faq') || menu.closest('.agfx-nav-faq')) continue;
+      const items = [...menu.children].filter(li => li.tagName === 'LI' && li.querySelector('a[href]'));
+      const template = items[items.length - 1];
+      if (!template) continue;
+      const clone = template.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.querySelectorAll('ul, .sub-menu, button').forEach(el => el.remove());
+      clone.className = `${clone.className.replace(/current[-\w]*/g, '').trim()} agfx-nav-faq`;
+      const anchor = clone.querySelector('a');
+      if (!anchor) continue;
+      anchor.setAttribute('href', FAQ_PDF);
+      anchor.textContent = 'FAQ';
+      anchor.removeAttribute('aria-current');
+      template.after(clone);
+    }
+
+    // Always-visible FAQ button in the mobile header (hamburger row), so the
+    // FAQ is one tap away on phones without opening the menu.
+    const mobileColumn = document.querySelector('.shfb-header.shfb-mobile .shfb-main_header_row .shfb-column-3');
+    if (mobileColumn && !mobileColumn.querySelector('.agfx-mobile-faq')) {
+      const link = document.createElement('a');
+      link.className = 'agfx-mobile-faq';
+      link.href = FAQ_PDF;
+      link.textContent = 'FAQ';
+      mobileColumn.prepend(link);
     }
   };
 
@@ -386,17 +404,17 @@
 
     if (pageKey === 'resources') {
       const expected = [
-        ['post-15765', 'lead', 'Arc Guard logo for ignition risk at welding connectors'],
-        ['post-730', 'compact', 'Arc Guard logo for welding connector spark safety'],
-        ['post-731', 'compact', 'Arc Guard logo for hot-connector equipment cost']
+        ['post-15765', 'lead'],
+        ['post-730', 'compact'],
+        ['post-731', 'compact']
       ];
-      resourceImagePresentation = expected.every(([postId, role, alt]) => {
+      resourceImagePresentation = expected.every(([postId, role]) => {
         const article = document.getElementById(postId);
         const image = article?.querySelector('.entry-thumb img');
         const frame = article?.querySelector('.entry-thumb')?.getBoundingClientRect();
         if (!article || !image || !frame) return false;
         const frameWithinRole = role === 'lead' ? frame.height <= 301 : frame.height >= 179 && frame.height <= 221;
-        return article.dataset.agfxResourceRole === role && image.alt === alt && frameWithinRole;
+        return article.dataset.agfxResourceRole === role && frameWithinRole;
       });
     }
 
@@ -423,11 +441,11 @@
   };
 
   applyPatentedCopy();
-  addAltText();
   refineResourcePostImages();
   improveMediaSemantics();
   manageHomeEmptyCarousel();
   improveLinksAndActions();
+  injectFaqAccess();
   enhanceFooter();
   for (const headerCta of document.querySelectorAll('.shfb-component-button .button, .shfb-component-button2 .button')) {
     headerCta.classList.add('agfx-magnet');
