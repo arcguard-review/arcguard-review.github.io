@@ -276,6 +276,274 @@
       link.textContent = 'FAQ';
       mobileColumn.prepend(link);
     }
+
+    // The native theme has no header CTA on phones — mirror the desktop
+    // "Schedule a Consult" button at the top of the offcanvas menu.
+    for (const menu of document.querySelectorAll('.sydney-offcanvas-menu ul.menu, .sydney-offcanvas-menu ul.sydney-dropdown-ul')) {
+      if (menu.closest('li') || menu.querySelector('.agfx-offcanvas-consult')) continue;
+      const item = document.createElement('li');
+      item.innerHTML = `<a class="agfx-button agfx-offcanvas-consult" href="https://calendly.com/m-moran-arcguardinc/30min">Schedule a Consult</a>`;
+      menu.prepend(item);
+    }
+  };
+
+  // ---- Compliance assessment (restored 2026-07-21 at the client's request:
+  // "add back the compliance assessment"). Concept approved on the recorded
+  // 7/16 Zoom (Marco: "So you think you're compliant? See how you stack up";
+  // Corban: "a button that says compliance assessment ... it pops up asking
+  // for their email"). Leads: localStorage + prefilled email CC'ing
+  // J.Crumholt@ArcGuardInc.com, plus a Google Analytics `generate_lead` event
+  // through the site's Site Kit tag (GT-WPL27JSD) so conversion rate is
+  // trackable in GA4. No PII is sent to GA.
+  const CALENDLY_URL = 'https://calendly.com/m-moran-arcguardinc/30min';
+
+  const trackEvent = (eventName, params) => {
+    try {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName, params);
+      } else if (Array.isArray(window.dataLayer)) {
+        window.dataLayer.push({ event: eventName, ...params });
+      }
+    } catch {}
+  };
+
+  const ASSESSMENT = {
+    questions: [
+      { cat: 'Permits & Process', text: 'Do welding tasks at your site require a documented hot work permit before work begins?', options: ['Always — every task', 'Sometimes / task-dependent', 'No formal permit process'] },
+      { cat: 'Hierarchy of Controls', text: 'Are engineered controls evaluated before relying on PPE, following the OSHA hierarchy of controls?', options: ['Yes — formally documented', 'Informally considered', 'PPE is our primary control'] },
+      { cat: 'Hierarchy of Controls', text: 'How are welding lead connections protected against accidental disconnect during elevated or hot work?', options: ['Engineered locking device', 'Taping welding lead connections', 'No specific protection'] },
+      { cat: 'Inspection & Condition', text: 'How often are welding leads and connectors inspected for damage, wear, or exposed terminals?', options: ['Every shift / pre-use', 'Weekly or monthly', 'No set schedule'] },
+      { cat: 'Dropped Objects', text: 'Has your site had a near-miss or incident involving a dropped tool or component in the past year?', options: ['No', 'Unsure', 'Yes'] },
+      { cat: 'Dropped Objects', text: 'Do you run a dropped-object (DROPS) prevention program that covers hot work at elevation?', options: ['Yes — active program', 'Partial coverage', 'No program'] },
+      { cat: 'Inspection & Condition', text: 'Are energized female connector ends physically covered whenever leads are disconnected?', options: ['Always — by design', 'Sometimes / crew-dependent', 'Rarely or never'] },
+      { cat: 'Permits & Process', text: 'Is connector-level protection specifically documented in your hot-work JSA or permit process?', options: ['Yes', 'Sometimes', 'No'] }
+    ],
+    tiers: [
+      { min: 13, label: 'Strong Program', note: 'Your controls are layered and documented. The remaining gaps below are refinement opportunities.' },
+      { min: 8, label: 'Developing Program', note: 'Good foundations with meaningful gaps — the categories below show where an engineered control would strengthen your program.' },
+      { min: 0, label: 'Elevated Exposure', note: 'Several answers indicate reliance on practice rather than engineered controls. The gaps below are where inspectors and incident investigations look first.' }
+    ]
+  };
+
+  const injectAssessment = () => {
+    if (document.querySelector('.agfx-assess')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'agfx-assess';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Welding hot-work compliance self-check');
+    overlay.hidden = true;
+    overlay.innerHTML = `
+      <div class="agfx-assess__panel">
+        <button class="agfx-assess__close" type="button" aria-label="Close self-check">×</button>
+        <div class="agfx-assess__stage" data-stage="intro">
+          <p class="agfx-section-label">Compliance self-check</p>
+          <h2>How exposed is your hot-work program?</h2>
+          <p class="agfx-assess__lede">Eight questions, about two minutes. Scored against the themes OSHA hot-work and hierarchy-of-controls guidance emphasizes — permits, engineered controls, inspection, and dropped-object prevention.</p>
+          <button class="agfx-button agfx-assess__start" type="button">Start the Self-Check</button>
+          <p class="agfx-assess__fine">Educational self-assessment — not a compliance determination or legal advice.</p>
+        </div>
+        <div class="agfx-assess__stage" data-stage="quiz" hidden>
+          <div class="agfx-assess__progress"><span></span></div>
+          <p class="agfx-assess__count"></p>
+          <p class="agfx-assess__cat"></p>
+          <h3 class="agfx-assess__question"></h3>
+          <div class="agfx-assess__options"></div>
+        </div>
+        <div class="agfx-assess__stage" data-stage="gate" hidden>
+          <p class="agfx-section-label">Your results are ready</p>
+          <h2>See your program scorecard</h2>
+          <p class="agfx-assess__lede">Where should we send your category breakdown and recommendations?</p>
+          <form class="agfx-assess__form" novalidate>
+            <input type="text" name="name" placeholder="Name" autocomplete="name" required>
+            <input type="text" name="company" placeholder="Company" autocomplete="organization" required>
+            <input type="email" name="email" placeholder="Work email" autocomplete="email" required>
+            <button class="agfx-button" type="submit">Show My Scorecard</button>
+            <p class="agfx-assess__error" hidden>Please enter your name, company, and a valid work email.</p>
+          </form>
+        </div>
+        <div class="agfx-assess__stage" data-stage="results" hidden>
+          <p class="agfx-section-label">Your scorecard</p>
+          <div class="agfx-assess__dialwrap">
+            <svg class="agfx-assess__dial" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="agfx-assess__dial-track" cx="60" cy="60" r="52"></circle>
+              <circle class="agfx-assess__dial-fill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="agfx-assess__dial-num"><strong>0</strong><span>/ 16</span></div>
+          </div>
+          <h2 class="agfx-assess__tier"></h2>
+          <p class="agfx-assess__tiernote"></p>
+          <div class="agfx-assess__cats"></div>
+          <div class="agfx-assess__gap" hidden>
+            <strong>Connector-level gap detected</strong>
+            <p>Your answers on connector protection are where engineered controls matter most. Arc Guard™ is a patented, documentable engineered control for exactly this gap — a locking cover for welding lead connections that supports your hierarchy-of-controls and DROPS documentation.</p>
+          </div>
+          <div class="agfx-actions">
+            <a class="agfx-button" data-assess-cta href="${CALENDLY_URL}">Schedule a Consult</a>
+            <a class="agfx-button agfx-button--secondary" data-assess-email href="#">Email Me This Scorecard</a>
+          </div>
+          <p class="agfx-assess__fine">Educational self-assessment — not a compliance determination or legal advice.</p>
+        </div>
+      </div>`;
+    document.body.append(overlay);
+
+    const stages = {};
+    for (const stage of overlay.querySelectorAll('.agfx-assess__stage')) stages[stage.dataset.stage] = stage;
+    const show = name => {
+      for (const [key, el] of Object.entries(stages)) el.hidden = key !== name;
+      overlay.querySelector('.agfx-assess__panel').scrollTop = 0;
+    };
+
+    const answers = [];
+    let current = 0;
+    const lead = {};
+
+    const renderQuestion = () => {
+      const q = ASSESSMENT.questions[current];
+      stages.quiz.querySelector('.agfx-assess__progress span').style.width = `${(current / ASSESSMENT.questions.length) * 100}%`;
+      stages.quiz.querySelector('.agfx-assess__count').textContent = `Question ${current + 1} of ${ASSESSMENT.questions.length}`;
+      stages.quiz.querySelector('.agfx-assess__cat').textContent = q.cat;
+      stages.quiz.querySelector('.agfx-assess__question').textContent = q.text;
+      const box = stages.quiz.querySelector('.agfx-assess__options');
+      box.innerHTML = '';
+      q.options.forEach((label, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'agfx-assess__option';
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          answers[current] = index;
+          current += 1;
+          if (current < ASSESSMENT.questions.length) renderQuestion();
+          else show('gate');
+        });
+        box.append(btn);
+      });
+      stages.quiz.classList.remove('agfx-assess__stage--in');
+      requestAnimationFrame(() => stages.quiz.classList.add('agfx-assess__stage--in'));
+    };
+
+    const score = () => answers.reduce((sum, a) => sum + (2 - a), 0);
+
+    const renderResults = () => {
+      const total = score();
+      const max = ASSESSMENT.questions.length * 2;
+      const tier = ASSESSMENT.tiers.find(t => total >= t.min);
+      stages.results.querySelector('.agfx-assess__tier').textContent = tier.label;
+      stages.results.querySelector('.agfx-assess__tiernote').textContent = tier.note;
+      stages.results.querySelector('.agfx-assess__dial-num strong').textContent = total;
+      const fill = stages.results.querySelector('.agfx-assess__dial-fill');
+      const circumference = 2 * Math.PI * 52;
+      fill.style.strokeDasharray = circumference;
+      fill.style.strokeDashoffset = circumference;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          fill.style.strokeDashoffset = circumference * (1 - total / max);
+        })
+      );
+      const cats = {};
+      ASSESSMENT.questions.forEach((q, i) => {
+        cats[q.cat] = cats[q.cat] || { got: 0, max: 0 };
+        cats[q.cat].got += 2 - (answers[i] ?? 2);
+        cats[q.cat].max += 2;
+      });
+      const catBox = stages.results.querySelector('.agfx-assess__cats');
+      catBox.innerHTML = '';
+      for (const [name, c] of Object.entries(cats)) {
+        const pct = Math.round((c.got / c.max) * 100);
+        const row = document.createElement('div');
+        row.className = 'agfx-assess__catrow';
+        row.innerHTML = `<span>${name}</span><div class="agfx-assess__bar"><i style="width:0%"></i></div><em>${c.got}/${c.max}</em>`;
+        catBox.append(row);
+        requestAnimationFrame(() => requestAnimationFrame(() => { row.querySelector('i').style.width = `${pct}%`; }));
+      }
+      const connectorGap = (answers[2] ?? 2) > 0 || (answers[6] ?? 2) > 0;
+      stages.results.querySelector('.agfx-assess__gap').hidden = !connectorGap;
+      const lines = ASSESSMENT.questions.map((q, i) => `${q.cat} — ${q.text} → ${q.options[answers[i]]}`);
+      const body = `Welding Hot-Work Compliance Self-Check scorecard%0D%0A%0D%0A${encodeURIComponent(lead.name || '')} · ${encodeURIComponent(lead.company || '')} · ${encodeURIComponent(lead.email || '')}%0D%0AScore: ${total}/${max} — ${tier.label}%0D%0A%0D%0A${lines.map(l => encodeURIComponent(l)).join('%0D%0A')}`;
+      stages.results.querySelector('[data-assess-email]').href =
+        `mailto:${encodeURIComponent(lead.email || '')}?cc=J.Crumholt@ArcGuardInc.com&subject=${encodeURIComponent('Your Arc Guard compliance self-check scorecard')}&body=${body}`;
+      show('results');
+    };
+
+    stages.gate.querySelector('.agfx-assess__form').addEventListener('submit', event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      lead.name = form.name.value.trim();
+      lead.company = form.company.value.trim();
+      lead.email = form.email.value.trim();
+      const valid = lead.name && lead.company && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email);
+      form.querySelector('.agfx-assess__error').hidden = valid;
+      if (!valid) return;
+      try {
+        const stash = JSON.parse(localStorage.getItem('agfx-assessment-leads') || '[]');
+        stash.push({ ...lead, answers: [...answers], score: score(), at: new Date().toISOString() });
+        localStorage.setItem('agfx-assessment-leads', JSON.stringify(stash));
+      } catch {}
+      // GA4 key event for conversion-rate tracking (no PII sent).
+      trackEvent('generate_lead', { method: 'compliance_assessment', assessment_score: score() });
+      renderResults();
+    });
+
+    const open = () => {
+      overlay.hidden = false;
+      document.body.classList.add('agfx-assess-open');
+      answers.length = 0;
+      current = 0;
+      show('intro');
+      trackEvent('assessment_open', { method: 'compliance_assessment' });
+    };
+    const close = () => {
+      overlay.hidden = true;
+      document.body.classList.remove('agfx-assess-open');
+      if (window.location.hash === '#compliance-check') history.replaceState(null, '', window.location.pathname + window.location.search);
+    };
+    overlay.querySelector('.agfx-assess__close').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !overlay.hidden) close(); });
+    overlay.querySelector('.agfx-assess__start').addEventListener('click', () => { show('quiz'); renderQuestion(); });
+
+    const bindTriggers = () => {
+      for (const anchor of document.querySelectorAll('a[href*="#compliance-check"]')) {
+        anchor.addEventListener('click', event => {
+          const url = new URL(anchor.href, window.location.href);
+          if (url.pathname === window.location.pathname) { event.preventDefault(); open(); }
+        });
+      }
+    };
+    bindTriggers();
+    if (window.location.hash === '#compliance-check') open();
+    window.addEventListener('hashchange', () => { if (window.location.hash === '#compliance-check') open(); });
+    window.__AGFX_ASSESS = { open, bindTriggers };
+  };
+
+  // Homepage entry band — headline and button wording are the client's own
+  // words from the recorded 7/16 call.
+  const injectAssessmentBand = () => {
+    if (pageKey !== 'home' || document.querySelector('.agfx-assess-band')) return;
+    const section = document.createElement('section');
+    section.className = 'agfx-assess-band agfx-reveal';
+    section.dataset.agfxInjected = 'assessment-band';
+    section.setAttribute('aria-label', 'Compliance assessment');
+    section.innerHTML = `
+      <h2>So You Think You're Compliant?</h2>
+      <p>See how you stack up.</p>
+      <a class="agfx-button" href="#compliance-check">Compliance Assessment</a>`;
+    const problemHeading = [...document.querySelectorAll('h2, h3, h4')].find(heading =>
+      /THE PROBLEM/i.test(heading.textContent)
+    );
+    const problemSection = problemHeading?.closest('.elementor > .e-con, .elementor > .elementor-section');
+    if (problemSection) {
+      const cardsSection = problemSection.nextElementSibling;
+      const anchor =
+        cardsSection && /Dropped Object|Costly Shutdowns|Unintentional Arcs/i.test(cardsSection.textContent)
+          ? cardsSection
+          : problemSection;
+      anchor.after(section);
+    } else {
+      (document.querySelector('.elementor-14043, main, #content') || document.body).append(section);
+    }
   };
 
   // Styling hook only — the footer keeps exactly the content WordPress renders.
@@ -446,6 +714,8 @@
   manageHomeEmptyCarousel();
   improveLinksAndActions();
   injectFaqAccess();
+  injectAssessmentBand();
+  injectAssessment();
   enhanceFooter();
   for (const headerCta of document.querySelectorAll('.shfb-component-button .button, .shfb-component-button2 .button')) {
     headerCta.classList.add('agfx-magnet');
