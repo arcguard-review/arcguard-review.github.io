@@ -2190,3 +2190,48 @@ body.agfx-facelift .sydney-offcanvas-menu .agfx-offcanvas-consult {
 body.agfx-facelift .elementor > :where(.e-con, .elementor-section) + :where(.e-con, .elementor-section) {
   margin-top: -2px !important;
 }
+
+/* Tap-to-unmute affordance over autoplaying muted videos (touch devices).
+   Sits top-center so it never covers the native transport controls. */
+body.agfx-facelift .agfx-video-holder {
+  position: relative;
+}
+
+body.agfx-facelift .agfx-unmute {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 640;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Home, phones/tablets: flat hero-video → black transition. The cream boxed
+   section after the hero exposed a margin band and an inset black stack that
+   stepped up above its parent ("spike"). */
+@media (max-width: 1024px) {
+  body.agfx-facelift.agfx-page-home .elementor-element-8b16c9e {
+    margin-top: 0 !important;
+    background-color: #000 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-8b16c9e > .e-con-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-2405bdd {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}

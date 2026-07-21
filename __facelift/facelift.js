@@ -207,8 +207,9 @@
         video.setAttribute('muted', '');
         video.autoplay = true;
         video.loop = true;
-        video.removeAttribute('controls');
-        video.controls = false;
+        // Keep the native controls: viewers can still scrub, rewind and
+        // unmute. The pill below is the obvious unmute affordance.
+        video.controls = true;
         video.preload = 'auto';
         const tryPlay = () => video.play().catch(() => {});
         tryPlay();
@@ -216,6 +217,25 @@
           new IntersectionObserver(entries => {
             for (const entry of entries) if (entry.isIntersecting) tryPlay();
           }, { threshold: 0.2 }).observe(video);
+        }
+
+        const holder = video.parentElement;
+        if (holder && !holder.querySelector('.agfx-unmute')) {
+          holder.classList.add('agfx-video-holder');
+          const unmute = document.createElement('button');
+          unmute.type = 'button';
+          unmute.className = 'agfx-unmute';
+          unmute.setAttribute('aria-label', 'Unmute video');
+          unmute.innerHTML = '&#128263; Tap to unmute';
+          unmute.addEventListener('click', event => {
+            event.stopPropagation();
+            video.muted = false;
+            video.play().catch(() => {});
+          });
+          video.addEventListener('volumechange', () => {
+            if (!video.muted) unmute.remove();
+          });
+          holder.append(unmute);
         }
       }
     }
