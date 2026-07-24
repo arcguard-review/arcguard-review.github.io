@@ -197,20 +197,22 @@
     // frame (no poster, no playsinline). Client request 2026-07-21: it must
     // autoplay muted and seamless on mobile. Touch devices get background-film
     // behavior; desktop keeps the native controls (viewers can unmute there).
-    const touchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    // Client 2026-07-24: desktop gets the same treatment as mobile — autoplay
+    // muted + seamless, with an obvious "Tap to unmute" affordance. Controls
+    // stay so viewers can scrub/rewind. Applies on every device now.
     for (const video of document.querySelectorAll('video.elementor-video, .elementor-widget-video video')) {
       video.setAttribute('playsinline', '');
       video.setAttribute('webkit-playsinline', '');
-      if (touchDevice) {
+      {
         video.muted = true;
         video.defaultMuted = true;
         video.setAttribute('muted', '');
         video.autoplay = true;
         video.loop = true;
-        // Keep the native controls: viewers can still scrub, rewind and
-        // unmute. The pill below is the obvious unmute affordance.
         video.controls = true;
         video.preload = 'auto';
+        // Center any browser-rendered captions inside the video frame.
+        for (const track of video.textTracks || []) track.mode = track.mode;
         const tryPlay = () => video.play().catch(() => {});
         tryPlay();
         if ('IntersectionObserver' in window) {
@@ -276,6 +278,11 @@
     if (ON_PRODUCTION) return;
     for (const anchor of document.querySelectorAll('a[href*="ArcGuard_FAQ"]')) {
       anchor.setAttribute('href', FAQ_PDF);
+    }
+    // Corrected Compliance Standards sheet (disclaimer paragraph removed per
+    // the client 2026-07-24). On production, replace the media-library file.
+    for (const anchor of document.querySelectorAll('a[href*="ArcGuard_Compliance_Standards"]')) {
+      anchor.setAttribute('href', siteHref('/docs/ArcGuard_Compliance_Standards.pdf'));
     }
   };
 
@@ -640,30 +647,36 @@
         <div class="agfx-actions agfx-compliance__cta">
           <a class="agfx-button" href="#compliance-check">Take the Compliance Assessment</a>
         </div>
-        <p class="agfx-compliance__disclaimer">Summarizes how Arc Guard™ helps support compliance with the cited OSHA, NFPA, ASME, and ANSI/ISEA standards. Provided for informational purposes; it does not replace site-specific hazard analysis, applicable PPE, or jurisdiction-specific regulations.</p>
       </div>`;
 
     const track = section.querySelector('.agfx-compliance__track');
     const detail = section.querySelector('.agfx-compliance__detail');
+    let current = 0;
+    // Center the active card within its own scroll container (not the page).
+    const centerCard = card => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      track.scrollTo({ left: cardCenter - track.clientWidth / 2, behavior: 'smooth' });
+    };
     const select = index => {
-      const s = COMPLIANCE_STANDARDS[index];
+      current = Math.max(0, Math.min(COMPLIANCE_STANDARDS.length - 1, index));
+      const s = COMPLIANCE_STANDARDS[current];
       section.querySelectorAll('.agfx-compliance__card').forEach(c =>
-        c.setAttribute('aria-selected', String(+c.dataset.index === index))
+        c.setAttribute('aria-selected', String(+c.dataset.index === current))
       );
       detail.querySelector('.agfx-compliance__detailcode').textContent = s.code;
       detail.querySelector('.agfx-compliance__std').textContent = s.standard;
       detail.querySelector('.agfx-compliance__ag').textContent = s.arcguard;
-      const active = section.querySelector(`.agfx-compliance__card[data-index="${index}"]`);
-      active?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      const active = section.querySelector(`.agfx-compliance__card[data-index="${current}"]`);
+      if (active) centerCard(active);
     };
     track.addEventListener('click', event => {
       const card = event.target.closest('.agfx-compliance__card');
       if (card) select(+card.dataset.index);
     });
+    // Arrows advance the SELECTED card so the detail panel stays in sync and
+    // the active card centers fully (client 2026-07-24 sync/centering fix).
     section.querySelectorAll('.agfx-compliance__arrow').forEach(btn =>
-      btn.addEventListener('click', () => {
-        track.scrollBy({ left: +btn.dataset.dir * Math.min(track.clientWidth * 0.8, 360), behavior: 'smooth' });
-      })
+      btn.addEventListener('click', () => select(current + Number(btn.dataset.dir)))
     );
     select(0);
 
@@ -681,6 +694,30 @@
     } else {
       (document.querySelector('.elementor-14043, main, #content') || document.body).append(section);
     }
+  };
+
+  // Client 2026-07-24: match the three "Who We Serve" card heights on the
+  // Industries page. They're grid items of uneven natural height, so equalize
+  // to the tallest when they sit side-by-side; leave natural when stacked.
+  const equalizeIndustryCards = () => {
+    if (pageKey !== 'industries') return;
+    const cards = ['f8de564', 'ee45058', '4f19efa']
+      .map(id => document.querySelector(`.elementor-element-${id}`))
+      .filter(Boolean);
+    if (cards.length < 2) return;
+    const apply = () => {
+      // A prior rule sets min-height:0 !important on these icon-boxes, so the
+      // equalized value must also be !important to win.
+      cards.forEach(c => c.style.removeProperty('min-height'));
+      const lefts = cards.map(c => Math.round(c.getBoundingClientRect().left));
+      const sideBySide = Math.max(...lefts) - Math.min(...lefts) > 80;
+      if (!sideBySide) return; // stacked (mobile): keep natural heights
+      const max = Math.max(...cards.map(c => c.getBoundingClientRect().height));
+      cards.forEach(c => c.style.setProperty('min-height', `${Math.round(max)}px`, 'important'));
+    };
+    apply();
+    window.setTimeout(apply, 400);
+    window.addEventListener('resize', apply, { passive: true });
   };
 
   // Client 2026-07-23: hide the homepage sections they asked to remove —
@@ -712,7 +749,9 @@
       p0.dataset.agfxCopyReplaced = 'product-intro';
     }
     if (p1) {
-      p1.textContent = '100% American made starting 2026. Veteran owned and operated.';
+      // Client-provided exact copy (2026-07-24).
+      p1.textContent =
+        'Arc Guard Inc. is a Service-Disabled Veteran Owned Small Business (SDVOSB) founded in 2024 to bring new innovation in safety to the people who mean the most — “The Front Line.”';
       p1.dataset.agfxCopyReplaced = 'product-intro-2';
     }
   };
@@ -882,6 +921,7 @@
   applyPatentedCopy();
   dedupeProductIntro();
   hideRemovedHomeSections();
+  equalizeIndustryCards();
   refineResourcePostImages();
   improveMediaSemantics();
   manageHomeEmptyCarousel();

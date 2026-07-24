@@ -2494,3 +2494,93 @@ body.agfx-facelift .agfx-compliance,
 body.agfx-facelift [id] {
   scroll-margin-top: 110px;
 }
+
+/* ============================================================
+   Round 5 — client change list 2026-07-24 (facelift-scale)
+   ============================================================ */
+
+/* HOME — compliance eyebrow box was width-constrained (~611px) and left-
+   aligned, shifting it ~74px left of the H2. Force full-width + centered. */
+body.agfx-facelift .agfx-compliance__head .agfx-compliance__eyebrow,
+body.agfx-facelift .agfx-compliance__head .agfx-compliance__sub {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  text-align: center !important;
+}
+
+/* Center any browser-rendered video captions within the frame. */
+body.agfx-facelift video::cue {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* Reduce homepage spacing (shorten page length without hurting layout). */
+body.agfx-facelift .agfx-compliance {
+  padding-top: clamp(2.25rem, 4.5vw, 3.5rem);
+  padding-bottom: clamp(2.25rem, 4.5vw, 3.5rem);
+}
+body.agfx-facelift .agfx-compliance__head {
+  margin-bottom: 1.6rem;
+}
+
+/* Hero paragraphs full-width on phones (2nd paragraph "boxy" fix). */
+@media (max-width: 767px) {
+  body.agfx-facelift.agfx-page-home .elementor-element-8b16c9e p {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+  }
+}
+
+/* INDUSTRIES — the three "Who We Serve" cards are equalized in JS
+   (equalizeIndustryCards) since they're grid items of uneven natural height;
+   this just keeps a soft card surface so equal heights read as intentional. */
+body.agfx-facelift.agfx-page-industries :where(
+  .elementor-element-1a1a459,
+  .elementor-element-d8a4806,
+  .elementor-element-cb78708) {
+  align-self: stretch !important;
+}
+
+/* INDUSTRIES — Construction & Mission Critical detail section to black to
+   match Oil & Gas and Industrial & Manufacturing. */
+body.agfx-facelift.agfx-page-industries .elementor-element-748a353,
+body.agfx-facelift.agfx-page-industries .elementor-element-748a353 :where(.e-con, .e-con-inner, .elementor-widget-wrap) {
+  background-color: #11100f !important;
+}
+body.agfx-facelift.agfx-page-industries .elementor-element-748a353 :where(p, li, span, h5, h6) {
+  color: #f4efe5 !important;
+}
+
+/* ABOUT — darken the near-invisible cream-on-cream page title; tighten the
+   large gap between the page header and "Who We Are". */
+body.agfx-facelift.agfx-page-about .page-header .agfx-original-title,
+body.agfx-facelift.agfx-page-about .entry-header .agfx-original-title,
+body.agfx-facelift.agfx-page-about .page-header :where(h1, h2),
+body.agfx-facelift.agfx-page-about .entry-header :where(h1, h2) {
+  color: #14110d !important;
+}
+body.agfx-facelift.agfx-page-about .page-header,
+body.agfx-facelift.agfx-page-about .entry-header {
+  padding-top: 2rem !important;
+  padding-bottom: 0.5rem !important;
+}
+body.agfx-facelift.agfx-page-about .elementor-14346 > :where(.e-con, .elementor-section):first-child {
+  padding-top: 1.25rem !important;
+}
+
+/* CONTACT — remove the empty black band above the logo/headline (native 102px
+   top margin on the logo widget) and shrink the tall map. */
+body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 {
+  padding-top: 1.5rem !important;
+}
+body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 {
+  margin-top: 0 !important;
+}
+body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5),
+body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5) iframe {
+  height: 300px !important;
+  min-height: 300px !important;
+  max-height: 300px !important;
+}
