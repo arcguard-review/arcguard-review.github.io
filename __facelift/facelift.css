@@ -141,7 +141,9 @@ body.agfx-facelift :where(.shfb-header.shfb-desktop, .shfb-header.shfb-mobile, #
   body.agfx-facelift .agfx-mobile-faq {
     display: inline-flex;
     align-items: center;
-    padding: 0.42rem 0.7rem;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.42rem 0.85rem;
     border: 1px solid #fff;
     border-radius: 3px;
     background: linear-gradient(rgb(0, 0, 0) 0%, rgb(204, 0, 0) 100%);
@@ -2297,8 +2299,8 @@ body.agfx-facelift .agfx-compliance__disclaimer {
   max-width: 780px;
   text-align: center;
   color: rgba(244, 239, 229, 0.5);
-  font-size: 0.8rem;
-  line-height: 1.5;
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
 
 @media (max-width: 767px) {
