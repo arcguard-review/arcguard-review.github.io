@@ -291,7 +291,9 @@
       const clone = template.cloneNode(true);
       clone.removeAttribute('id');
       clone.querySelectorAll('ul, .sub-menu, button').forEach(el => el.remove());
-      clone.className = `${clone.className.replace(/current[-\w]*/g, '').trim()} agfx-nav-faq`;
+      // Client 2026-07-23: the FAQ nav item becomes the red button in the top
+      // banner, replacing "Schedule a Consult" there.
+      clone.className = `${clone.className.replace(/current[-\w]*/g, '').trim()} agfx-nav-faq agfx-nav-faq-btn`;
       const anchor = clone.querySelector('a');
       if (!anchor) continue;
       anchor.setAttribute('href', FAQ_PDF);
@@ -299,6 +301,12 @@
       anchor.removeAttribute('aria-current');
       template.after(clone);
     }
+
+    // Replace the native desktop "Schedule a Consult" header button with FAQ
+    // (client 2026-07-23). Hide the native button; the FAQ red button above
+    // carries the top-banner CTA. (For production, Corban can relabel that
+    // button natively in Elementor; this preview overrides it.)
+    document.body.classList.add('agfx-faq-cta');
 
     // Always-visible FAQ button in the mobile header (hamburger row), so the
     // FAQ is one tap away on phones without opening the menu.
@@ -311,25 +319,14 @@
       mobileColumn.prepend(link);
     }
 
-    // The native theme has no header CTA on phones — mirror the desktop
-    // "Schedule a Consult" button at the top of the offcanvas menu.
+    // Consult access still lives inside the offcanvas menu on phones (the
+    // top-banner CTA is now FAQ per the client). The native theme has no
+    // header CTA on phones, so keep this menu entry for consult scheduling.
     for (const menu of document.querySelectorAll('.sydney-offcanvas-menu ul.menu, .sydney-offcanvas-menu ul.sydney-dropdown-ul')) {
       if (menu.closest('li') || menu.querySelector('.agfx-offcanvas-consult')) continue;
       const item = document.createElement('li');
       item.innerHTML = `<a class="agfx-button agfx-offcanvas-consult" href="${CALENDLY_URL}">Schedule a Consult</a>`;
       menu.prepend(item);
-    }
-
-    // Corban 2026-07-21: both buttons visible at the top on phones — FAQ
-    // stays as a pill, Schedule a Consult gets a slim bar under the header
-    // row (sticks with the sticky header).
-    const mobileHeader = document.querySelector('.shfb-header.shfb-mobile');
-    const mainRow = mobileHeader?.querySelector('.shfb-row-wrapper.shfb-main_header_row');
-    if (mainRow && !mobileHeader.querySelector('.agfx-mobile-ctabar')) {
-      const bar = document.createElement('div');
-      bar.className = 'agfx-mobile-ctabar';
-      bar.innerHTML = `<a class="agfx-button" href="${CALENDLY_URL}">Schedule a Consult</a>`;
-      mainRow.after(bar);
     }
   };
 
@@ -564,18 +561,112 @@
     window.__AGFX_ASSESS = { open, bindTriggers };
   };
 
-  // Homepage entry band — headline and button wording are the client's own
-  // words from the recorded 7/16 call.
-  const injectAssessmentBand = () => {
-    if (pageKey !== 'home' || document.querySelector('.agfx-assess-band')) return;
+  // Regulatory Compliance section (client 2026-07-23: place the Compliance
+  // Standards Reference Sheet content prominently on the homepage as an
+  // interactive carousel so visitors see they are in violation without Arc
+  // Guard). Content is VERBATIM from Arc Guard's own Compliance Standards
+  // Reference Sheet (ArcGuard_Compliance_Standards-4.pdf). The header + the
+  // paired assessment CTA are the client's words from the 7/16 Zoom.
+  const COMPLIANCE_INTRO =
+    'Arc Guard™ is engineered to align with the safety standards that govern welding, hot work, and industrial operations. Each standard below cites an applicable regulation or consensus standard — and shows exactly where you may fall short without a connector-level control.';
+  const COMPLIANCE_STANDARDS = [
+    { code: 'OSHA 1910.254(b)(4)(ii)', title: 'Welding terminal protection',
+      standard: 'Terminals for welding leads shall be protected from accidental contact by personnel or metal objects.',
+      arcguard: 'Arc Guard™ addresses this with its spring-assisted cap that closes off the end of the energized connector, eliminating accidental contact at the terminal.' },
+    { code: 'OSHA Section 5(a)(1) — General Duty Clause', title: 'Workplaces free from recognized hazards',
+      standard: 'Each employer shall furnish to each of his employees employment and a place of employment which are free from recognized hazards that are causing or are likely to cause death or serious physical harm to his employees.',
+      arcguard: 'Arc Guard™ addresses and mitigates multiple recognized hazards at once — hazards that could lead to significant injury, equipment damage, or a catastrophic event around flammable materials and hydrocarbons.' },
+    { code: 'OSHA 1910.132(h)(1) & 1926.759', title: 'Falling object protection',
+      standard: 'All materials, equipment, and tools, which are not in use while aloft, shall be secured against accidental falling.',
+      arcguard: 'A cable connector that can vibrate loose and fall is "material or equipment." By providing a positive locking mechanism, Arc Guard™ ensures the connection is permanently secured — unlike tape, which is subject to adhesive failure from heat or UV exposure.' },
+    { code: 'OSHA 1910.39 — Fire Prevention Plans', title: 'Proper control of ignition sources',
+      standard: 'Requires employers to identify "potential ignition sources and their proper control."',
+      arcguard: 'Arc Guard™ acts as the "Proper Control" required by OSHA. Using the device is a proactive measure in a documented Fire Prevention Plan (FPP) to mitigate the risk of an electrical arc starting a fire.' },
+    { code: 'NFPA 70E — Arc Flash Safety', title: 'Equipment maintenance & ground-fault prevention',
+      standard: 'Focuses on the requirement to maintain electrical equipment in a manner that prevents arc flash hazards caused by failure of insulation or connections (prevention of unintended ground faults).',
+      arcguard: 'Arc Guard™ maintains the integrity of the connector interface, preventing the insulation and connection failures that lead to unintended ground faults and arc-flash events.' },
+    { code: 'NFPA 70E (Article 110.1) — Risk Assessment', title: 'Hierarchy of risk control',
+      standard: 'Requires a risk assessment to identify hazards. If a cable connector comes apart, it creates two hazards: an electrical arc flash (a potential ignition source) and a mechanical falling object. NFPA 70E promotes the "Hierarchy of Risk Control Methods."',
+      arcguard: 'Arc Guard™ is an Engineering Control, which is ranked higher — and is more effective — than Administrative Controls such as a rule telling workers to tape cables.' },
+    { code: 'NFPA 51B — Fire Prevention During Hot Work', title: 'Welding, cutting & other hot work',
+      standard: 'Requires that "all electrical equipment be in good working order" and that "cables be protected from damage."',
+      arcguard: 'An arc caused by a loose connector contacting a structure is essentially an unauthorized "Hot Work" event. Arc Guard™ prevents this accidental arc, removing the need for the extreme fire-watch precautions that would otherwise be required for a spark-producing environment.' },
+    { code: 'ASME Section VIII', title: 'Stray arc burn prevention',
+      standard: 'Mandates the repair or rejection of any base metal affected by stray arc burns.',
+      arcguard: 'Arc Guard™ prevents the likelihood of an energized connector contacting metal through its spring-assisted cap and locking mechanism, ensuring full engagement and conductivity. This reduces repair time and cost.' },
+    { code: 'ANSI/ISEA 121-2018', title: 'American National Standard for Dropped Object Prevention',
+      standard: 'Emphasizes that secondary retention must be purpose-built for the environment in which it is used.',
+      arcguard: 'Arc Guard™ is a purpose-built secondary retention device. It proves that "doing nothing" or "using tape" is an unrated, non-compliant method for securing components in high-elevation or industrial work zones.' }
+  ];
+
+  const injectComplianceSection = () => {
+    if (pageKey !== 'home' || document.querySelector('.agfx-compliance')) return;
     const section = document.createElement('section');
-    section.className = 'agfx-assess-band agfx-reveal';
-    section.dataset.agfxInjected = 'assessment-band';
-    section.setAttribute('aria-label', 'Compliance assessment');
+    section.className = 'agfx-compliance agfx-reveal';
+    section.dataset.agfxInjected = 'compliance';
+    section.setAttribute('aria-label', 'Regulatory compliance standards');
+
+    const cards = COMPLIANCE_STANDARDS.map((s, i) => `
+      <button class="agfx-compliance__card" type="button" role="tab" data-index="${i}" aria-selected="${i === 0}">
+        <span class="agfx-compliance__num">${i + 1}</span>
+        <span class="agfx-compliance__code">${s.code}</span>
+        <span class="agfx-compliance__title">${s.title}</span>
+      </button>`).join('');
+
     section.innerHTML = `
-      <h2>So You Think You're Compliant?</h2>
-      <p>See how you stack up.</p>
-      <a class="agfx-button" href="#compliance-check">Compliance Assessment</a>`;
+      <div class="agfx-compliance__inner">
+        <header class="agfx-compliance__head">
+          <p class="agfx-compliance__eyebrow">Regulatory Compliance</p>
+          <h2>So You Think You're Compliant?</h2>
+          <p class="agfx-compliance__sub">See how you stack up.</p>
+          <p class="agfx-compliance__intro">${COMPLIANCE_INTRO}</p>
+        </header>
+        <div class="agfx-compliance__rail">
+          <button class="agfx-compliance__arrow" data-dir="-1" type="button" aria-label="Previous standards">&#8249;</button>
+          <div class="agfx-compliance__track" role="tablist">${cards}</div>
+          <button class="agfx-compliance__arrow" data-dir="1" type="button" aria-label="More standards">&#8250;</button>
+        </div>
+        <div class="agfx-compliance__detail" role="tabpanel" aria-live="polite">
+          <div class="agfx-compliance__detailcode"></div>
+          <div class="agfx-compliance__block">
+            <h3>The Standard</h3>
+            <p class="agfx-compliance__std"></p>
+          </div>
+          <div class="agfx-compliance__block">
+            <h3>How Arc Guard™ Addresses It</h3>
+            <p class="agfx-compliance__ag"></p>
+          </div>
+        </div>
+        <div class="agfx-actions agfx-compliance__cta">
+          <a class="agfx-button" href="#compliance-check">Take the Compliance Assessment</a>
+        </div>
+        <p class="agfx-compliance__disclaimer">Summarizes how Arc Guard™ helps support compliance with the cited OSHA, NFPA, ASME, and ANSI/ISEA standards. Provided for informational purposes; it does not replace site-specific hazard analysis, applicable PPE, or jurisdiction-specific regulations.</p>
+      </div>`;
+
+    const track = section.querySelector('.agfx-compliance__track');
+    const detail = section.querySelector('.agfx-compliance__detail');
+    const select = index => {
+      const s = COMPLIANCE_STANDARDS[index];
+      section.querySelectorAll('.agfx-compliance__card').forEach(c =>
+        c.setAttribute('aria-selected', String(+c.dataset.index === index))
+      );
+      detail.querySelector('.agfx-compliance__detailcode').textContent = s.code;
+      detail.querySelector('.agfx-compliance__std').textContent = s.standard;
+      detail.querySelector('.agfx-compliance__ag').textContent = s.arcguard;
+      const active = section.querySelector(`.agfx-compliance__card[data-index="${index}"]`);
+      active?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    };
+    track.addEventListener('click', event => {
+      const card = event.target.closest('.agfx-compliance__card');
+      if (card) select(+card.dataset.index);
+    });
+    section.querySelectorAll('.agfx-compliance__arrow').forEach(btn =>
+      btn.addEventListener('click', () => {
+        track.scrollBy({ left: +btn.dataset.dir * Math.min(track.clientWidth * 0.8, 360), behavior: 'smooth' });
+      })
+    );
+    select(0);
+
     const problemHeading = [...document.querySelectorAll('h2, h3, h4')].find(heading =>
       /THE PROBLEM/i.test(heading.textContent)
     );
@@ -589,6 +680,40 @@
       anchor.after(section);
     } else {
       (document.querySelector('.elementor-14043, main, #content') || document.body).append(section);
+    }
+  };
+
+  // Client 2026-07-23: hide the homepage sections they asked to remove —
+  // "Protect Your People / Protect Your Job Site / How Arc Guard Works /
+  // See Key Features" (element #0067a64, which also holds the duplicate
+  // smaller video) and the "Get Started Today!" heading section (#5f03565).
+  // Hidden here for the staging preview; Corban deletes these natively in
+  // Elementor. Additive rule exception is client-ordered removal.
+  const hideRemovedHomeSections = () => {
+    if (pageKey !== 'home') return;
+    for (const id of ['0067a64', '5f03565']) {
+      document.querySelector(`.elementor-element-${id}`)?.classList.add('agfx-removed');
+    }
+  };
+
+  // Client 2026-07-23: the Product intro paragraphs repeat the homepage
+  // ("innovative safety device…" and "The spring-assisted cap automatically
+  // covers…"). Replace them with a patent-led factual statement composed from
+  // Justin's booklet (Benefits / Why Choose Arc Guard) so nothing repeats.
+  const dedupeProductIntro = () => {
+    if (pageKey !== 'product') return;
+    const root = document.querySelector('.elementor-401') || document.body;
+    const paras = [...root.querySelectorAll('p')];
+    const p0 = paras.find(p => /innovative safety device that attaches/i.test(p.textContent));
+    const p1 = paras.find(p => /spring-assisted cap automatically covers/i.test(p.textContent));
+    if (p0) {
+      p0.textContent =
+        'Arc Guard™ is now fully patented under U.S. Patent No. 12,671,212 B1. It is a simple, engineered, cost-effective solution that helps eliminate multiple job-site hazards at once — protecting workers and equipment, minimizing the risk of costly shutdowns and interruptions, and supporting OSHA and workplace safety compliance.';
+      p0.dataset.agfxCopyReplaced = 'product-intro';
+    }
+    if (p1) {
+      p1.textContent = '100% American made starting 2026. Veteran owned and operated.';
+      p1.dataset.agfxCopyReplaced = 'product-intro-2';
     }
   };
 
@@ -755,13 +880,15 @@
   };
 
   applyPatentedCopy();
+  dedupeProductIntro();
+  hideRemovedHomeSections();
   refineResourcePostImages();
   improveMediaSemantics();
   manageHomeEmptyCarousel();
   improveLinksAndActions();
   retargetFaqDocumentLinks();
   injectFaqAccess();
-  injectAssessmentBand();
+  injectComplianceSection();
   injectAssessment();
   enhanceFooter();
   for (const headerCta of document.querySelectorAll('.shfb-component-button .button, .shfb-component-button2 .button')) {
