@@ -652,10 +652,14 @@
     const track = section.querySelector('.agfx-compliance__track');
     const detail = section.querySelector('.agfx-compliance__detail');
     let current = 0;
-    // Center the active card within its own scroll container (not the page).
+    // Center the active card by scrolling ONLY the track horizontally (no page
+    // jump). getBoundingClientRect-based delta works regardless of offsetParent;
+    // the browser clamps scrollLeft so first/last cards settle at the edges.
     const centerCard = card => {
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      track.scrollTo({ left: cardCenter - track.clientWidth / 2, behavior: 'smooth' });
+      const tr = track.getBoundingClientRect();
+      const cr = card.getBoundingClientRect();
+      const delta = (cr.left + cr.width / 2) - (tr.left + tr.width / 2);
+      track.scrollBy({ left: delta, behavior: 'smooth' });
     };
     const select = index => {
       current = Math.max(0, Math.min(COMPLIANCE_STANDARDS.length - 1, index));
@@ -701,22 +705,38 @@
   // to the tallest when they sit side-by-side; leave natural when stacked.
   const equalizeIndustryCards = () => {
     if (pageKey !== 'industries') return;
-    const cards = ['f8de564', 'ee45058', '4f19efa']
+    // Align the "Hazard(s):" rows across the three columns by padding each
+    // description icon-box until every Hazard heading shares the same Y. That
+    // is the client's actual goal ("match up the card heights"). Each column
+    // (1a1a459 / d8a4806 / cb78708) holds one description box + its Hazard row.
+    const units = ['1a1a459', 'd8a4806', 'cb78708']
       .map(id => document.querySelector(`.elementor-element-${id}`))
-      .filter(Boolean);
-    if (cards.length < 2) return;
+      .filter(Boolean)
+      .map(col => ({
+        col,
+        desc: col.querySelector('.elementor-widget-icon-box'),
+        hazard: [...col.querySelectorAll('h3, h4, h5, h6')].find(h => /^Hazard\(s\)/i.test(h.textContent.trim()))
+      }))
+      .filter(u => u.desc && u.hazard);
+    if (units.length < 2) return;
     const apply = () => {
-      // A prior rule sets min-height:0 !important on these icon-boxes, so the
+      // A prior rule sets min-height:0 !important on the icon-boxes, so the
       // equalized value must also be !important to win.
-      cards.forEach(c => c.style.removeProperty('min-height'));
-      const lefts = cards.map(c => Math.round(c.getBoundingClientRect().left));
-      const sideBySide = Math.max(...lefts) - Math.min(...lefts) > 80;
-      if (!sideBySide) return; // stacked (mobile): keep natural heights
-      const max = Math.max(...cards.map(c => c.getBoundingClientRect().height));
-      cards.forEach(c => c.style.setProperty('min-height', `${Math.round(max)}px`, 'important'));
+      units.forEach(u => u.desc.style.removeProperty('min-height'));
+      const lefts = units.map(u => Math.round(u.col.getBoundingClientRect().left));
+      if (Math.max(...lefts) - Math.min(...lefts) <= 80) return; // stacked (mobile)
+      const tops = units.map(u => u.hazard.getBoundingClientRect().top);
+      const maxTop = Math.max(...tops);
+      units.forEach((u, i) => {
+        const delta = maxTop - tops[i];
+        if (delta <= 1) return;
+        const target = Math.round(u.desc.getBoundingClientRect().height + delta);
+        u.desc.style.setProperty('min-height', `${target}px`, 'important');
+      });
     };
     apply();
     window.setTimeout(apply, 400);
+    window.setTimeout(apply, 1200);
     window.addEventListener('resize', apply, { passive: true });
   };
 

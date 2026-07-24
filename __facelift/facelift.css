@@ -625,13 +625,11 @@ body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59
   color: var(--agfx-red-dark) !important;
 }
 
-body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span),
-body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-748a353 :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
   color: var(--agfx-ink) !important;
 }
 
-body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :is(h2, h3, h4, h5, h6),
-body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-748a353 :is(h2, h3, h4, h5, h6) {
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e :is(h2, h3, h4, h5, h6) {
   color: var(--agfx-red-dark) !important;
 }
 
@@ -2189,9 +2187,13 @@ body.agfx-facelift .agfx-compliance__track {
   display: flex;
   gap: 0.9rem;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  /* Cap the desktop track so the carousel reads as a focused component and the
+     active card actually centers (a full-width row can't). */
+  max-width: 920px;
+  margin-inline: auto;
   padding: 0.4rem 0.2rem 1rem;
   scrollbar-width: thin;
+  scroll-behavior: smooth;
 }
 
 body.agfx-facelift .agfx-compliance__card {
@@ -2308,9 +2310,41 @@ body.agfx-facelift .agfx-compliance__disclaimer {
     grid-template-columns: 1fr;
   }
 
+  /* Overlay the arrows on the track edges so they don't eat the track width;
+     the card then fits with a clean peek and centers after an arrow tap. */
+  body.agfx-facelift .agfx-compliance {
+    padding-inline: 0.75rem;
+  }
+
+  body.agfx-facelift .agfx-compliance__rail {
+    position: relative;
+  }
+
+  body.agfx-facelift .agfx-compliance__track {
+    width: 100%;
+  }
+
   body.agfx-facelift .agfx-compliance__arrow {
-    width: 38px;
-    font-size: 1.25rem;
+    position: absolute;
+    top: 38%;
+    z-index: 3;
+    width: 34px;
+    height: 48px;
+    font-size: 1.2rem;
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  body.agfx-facelift .agfx-compliance__arrow[data-dir="-1"] {
+    left: 0;
+  }
+
+  body.agfx-facelift .agfx-compliance__arrow[data-dir="1"] {
+    right: 0;
+  }
+
+  body.agfx-facelift .agfx-compliance__card {
+    width: 72vw;
+    max-width: 280px;
   }
 }
 
@@ -2546,10 +2580,15 @@ body.agfx-facelift.agfx-page-industries :where(
 /* INDUSTRIES — Construction & Mission Critical detail section to black to
    match Oil & Gas and Industrial & Manufacturing. */
 body.agfx-facelift.agfx-page-industries .elementor-element-748a353,
-body.agfx-facelift.agfx-page-industries .elementor-element-748a353 :where(.e-con, .e-con-inner, .elementor-widget-wrap) {
+body.agfx-facelift.agfx-page-industries .elementor-element-748a353 .e-con,
+body.agfx-facelift.agfx-page-industries .elementor-element-748a353 .e-con-inner,
+body.agfx-facelift.agfx-page-industries .elementor-element-748a353 .elementor-widget-wrap {
   background-color: #11100f !important;
 }
-body.agfx-facelift.agfx-page-industries .elementor-element-748a353 :where(p, li, span, h5, h6) {
+/* All Construction-section text turns light to match the Oil & Gas / Industrial
+   black sections (matching specificity to the cream-section rule above; the
+   red-gradient "Schedule a Consult" button keeps its own white via its rules). */
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-748a353 :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, strong, span) {
   color: #f4efe5 !important;
 }
 
