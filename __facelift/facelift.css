@@ -2623,3 +2623,373 @@ body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .element
   min-height: 300px !important;
   max-height: 300px !important;
 }
+
+/* ============================================================
+   Final client edits — 2026-07-29 (staging only)
+   ============================================================ */
+
+/* TOP HEADER — increase every main page-navigation title while preserving a
+   single row through the client's minimized-window desktop widths. */
+body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {
+  font-size: 1rem !important;
+}
+
+@media (min-width: 1025px) and (max-width: 1340px) {
+  body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {
+    font-size: 0.86rem !important;
+  }
+
+  body.agfx-facelift .shfb-header #primary-menu > li {
+    margin-right: 6px !important;
+  }
+
+  body.agfx-facelift #primary-menu > li.agfx-nav-faq-btn {
+    margin-left: 6px;
+  }
+
+  body.agfx-facelift #primary-menu > li.agfx-nav-faq-btn > a {
+    padding-inline: 1rem !important;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1120px) {
+  body.agfx-facelift :where(.main-navigation, .shfb-navigation) a:not(.button) {
+    font-size: 0.82rem !important;
+  }
+
+  body.agfx-facelift .shfb-header #primary-menu > li {
+    margin-right: 3px !important;
+  }
+}
+
+/* HOME — the centered assessment CTA now sits immediately after
+   "See how you stack up." and before the explanatory paragraph/cards. */
+body.agfx-facelift .agfx-compliance__head .agfx-compliance__cta {
+  margin: 0.85rem auto 1.7rem;
+}
+
+body.agfx-facelift .agfx-compliance__head .agfx-compliance__cta .agfx-button {
+  display: inline-flex;
+  margin-inline: auto;
+}
+
+/* INDUSTRIES — shorten the page without touching a word: trim the space
+   between "Who We Serve" and its cards, then tighten the three detail bands. */
+body.agfx-facelift.agfx-page-industries .elementor-element-bd2062a {
+  padding-top: clamp(2.25rem, 4vw, 3.5rem) !important;
+  padding-bottom: clamp(1.25rem, 2.5vw, 2rem) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e {
+  padding-top: clamp(1.25rem, 2.5vw, 2rem) !important;
+  padding-bottom: clamp(2.5rem, 4.5vw, 4rem) !important;
+}
+
+body.agfx-facelift.agfx-page-industries :where(
+  .elementor-element-d4e4f07,
+  .elementor-element-748a353,
+  .elementor-element-953feb9) {
+  padding-top: clamp(2.25rem, 3.5vw, 3.25rem) !important;
+  padding-bottom: clamp(2.25rem, 3.5vw, 3.25rem) !important;
+}
+
+/* ABOUT — remove the entire standalone logo band directly above "Resonate
+   with our Story?" and tighten the remaining call-to-action section. */
+body.agfx-facelift.agfx-page-about .elementor-element-9bcbf9c {
+  display: none !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 {
+  padding-bottom: clamp(1.75rem, 2.5vw, 2.25rem) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b {
+  padding-top: clamp(2.5rem, 4.5vw, 3.75rem) !important;
+  padding-bottom: clamp(2.5rem, 4.5vw, 3.75rem) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa {
+  min-height: 0 !important;
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-253bda3 {
+  margin-top: 0 !important;
+}
+
+/* CONTACT — reduced logo plus a wide sentence-case message and centered CTA. */
+body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 0.36fr) minmax(0, 0.64fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center !important;
+  padding-top: clamp(2.5rem, 5vw, 4.5rem) !important;
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem) !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 > :where(
+  .elementor-element-a7bc327,
+  .elementor-element-2ef30fd) {
+  --width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1,
+body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 .elementor-widget-container {
+  display: flex;
+  justify-content: center;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 img {
+  width: min(100%, 300px) !important;
+  max-width: 300px !important;
+  height: auto !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-2ef30fd,
+body.agfx-facelift.agfx-page-contact .elementor-element-49cdf40 {
+  align-items: stretch !important;
+}
+
+body.agfx-facelift.agfx-page-contact :where(
+  .elementor-element-578202f,
+  .elementor-element-de40947,
+  .elementor-element-9edcd5c) {
+  --width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-578202f .elementor-heading-title {
+  max-width: none;
+  color: var(--agfx-cream) !important;
+  font-size: clamp(1.75rem, 3vw, 3rem) !important;
+  line-height: 1.1;
+  text-align: left !important;
+  text-transform: none !important;
+  text-wrap: balance;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-de40947 {
+  margin-top: 1.25rem !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-de40947 .elementor-heading-title {
+  color: var(--agfx-cream) !important;
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem) !important;
+  font-weight: 500 !important;
+  line-height: 1.55;
+  text-align: left !important;
+  text-transform: none !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c {
+  margin-top: 1.75rem !important;
+  text-align: center !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c .elementor-button {
+  min-width: 230px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* The requested form replaces Justin's visible contact strip. The original
+   strip stays in the DOM for instant rollback; the map remains immediately
+   below this new panel. */
+body.agfx-facelift.agfx-page-contact .agfx-contact-source-hidden {
+  display: none !important;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-panel {
+  padding: clamp(3.5rem, 7vw, 6rem) clamp(1.25rem, 6vw, 5rem);
+  background: var(--agfx-cream);
+  color: var(--agfx-ink);
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-panel__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.75fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+  width: min(100%, 1180px);
+  margin-inline: auto;
+  align-items: start;
+}
+
+body.agfx-facelift.agfx-page-contact :where(
+  .agfx-contact-form__eyebrow,
+  .agfx-contact-details__eyebrow) {
+  margin: 0 0 0.65rem;
+  color: var(--agfx-red-dark);
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form-wrap > h2 {
+  margin: 0 0 1.75rem;
+  color: var(--agfx-ink);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem 1.25rem;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form label {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--agfx-ink);
+  font-size: 0.82rem;
+  font-weight: 720;
+  letter-spacing: 0.03em;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form__full {
+  grid-column: 1 / -1;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form :where(input, textarea) {
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(17, 16, 15, 0.28);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--agfx-ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form :where(input, textarea):focus {
+  border-color: var(--agfx-red);
+  outline: 3px solid rgba(178, 24, 28, 0.18);
+  outline-offset: 1px;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form__trap {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-form__status {
+  margin: 0;
+  color: var(--agfx-ink);
+  font-size: 0.92rem;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-details {
+  display: grid;
+  gap: 2.5rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-top: 4px solid var(--agfx-red);
+  background: var(--agfx-paper);
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-details address {
+  color: var(--agfx-ink);
+  font-size: 1.05rem;
+  font-style: normal;
+  line-height: 1.7;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-social {
+  text-align: center;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-social h2 {
+  margin: 0 0 1.25rem;
+  color: var(--agfx-ink);
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  line-height: 1.2;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-social__links {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-social__links a {
+  display: inline-flex;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--agfx-red);
+  border-radius: 50%;
+  background: var(--agfx-ink);
+  color: #fff !important;
+  font-size: 1.35rem;
+  text-decoration: none;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+body.agfx-facelift.agfx-page-contact .agfx-contact-social__links a:hover {
+  transform: translateY(-2px);
+  background: var(--agfx-red-dark);
+}
+
+@media (max-width: 900px) {
+  body.agfx-facelift.agfx-page-contact .elementor-element-898bff1,
+  body.agfx-facelift.agfx-page-contact .agfx-contact-panel__inner {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 img {
+    width: min(48vw, 175px) !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact :where(
+    .elementor-element-578202f .elementor-heading-title,
+    .elementor-element-de40947 .elementor-heading-title) {
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.agfx-facelift.agfx-page-contact .agfx-contact-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.agfx-facelift.agfx-page-contact .agfx-contact-form__full {
+    grid-column: auto;
+  }
+
+  body.agfx-facelift.agfx-page-contact .agfx-contact-form__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body.agfx-facelift.agfx-page-contact .agfx-contact-form__actions .agfx-button {
+    width: 100%;
+  }
+}

@@ -346,6 +346,10 @@
   // through the site's Site Kit tag (GT-WPL27JSD) so conversion rate is
   // trackable in GA4. No PII is sent to GA.
   const CALENDLY_URL = 'https://calendly.com/m-moran-arcguardinc/30min';
+  // Marco's individual work address is not present in the approved project
+  // materials. Until the client supplies it, route the contact form to Arc
+  // Guard's verified general inbox plus Justin's verified work address.
+  const CONTACT_EMAILS = ['info@arcguardinc.com', 'J.Crumholt@ArcGuardInc.com'];
 
   const trackEvent = (eventName, params) => {
     try {
@@ -626,6 +630,9 @@
           <p class="agfx-compliance__eyebrow">Regulatory Compliance</p>
           <h2>So You Think You're Compliant?</h2>
           <p class="agfx-compliance__sub">See how you stack up.</p>
+          <div class="agfx-actions agfx-compliance__cta">
+            <a class="agfx-button" href="#compliance-check">Take the Compliance Assessment</a>
+          </div>
           <p class="agfx-compliance__intro">${COMPLIANCE_INTRO}</p>
         </header>
         <div class="agfx-compliance__rail">
@@ -643,9 +650,6 @@
             <h3>How Arc Guard™ Addresses It</h3>
             <p class="agfx-compliance__ag"></p>
           </div>
-        </div>
-        <div class="agfx-actions agfx-compliance__cta">
-          <a class="agfx-button" href="#compliance-check">Take the Compliance Assessment</a>
         </div>
       </div>`;
 
@@ -753,10 +757,7 @@
     }
   };
 
-  // Client 2026-07-23: the Product intro paragraphs repeat the homepage
-  // ("innovative safety device…" and "The spring-assisted cap automatically
-  // covers…"). Replace them with a patent-led factual statement composed from
-  // Justin's booklet (Benefits / Why Choose Arc Guard) so nothing repeats.
+  // Client 2026-07-29: replace the two Product intro paragraphs word-for-word.
   const dedupeProductIntro = () => {
     if (pageKey !== 'product') return;
     const root = document.querySelector('.elementor-401') || document.body;
@@ -765,15 +766,166 @@
     const p1 = paras.find(p => /spring-assisted cap automatically covers/i.test(p.textContent));
     if (p0) {
       p0.textContent =
-        'Arc Guard™ is now fully patented under U.S. Patent No. 12,671,212 B1. It is a simple, engineered, cost-effective solution that helps eliminate multiple job-site hazards at once — protecting workers and equipment, minimizing the risk of costly shutdowns and interruptions, and supporting OSHA and workplace safety compliance.';
+        'Arc Guard™ is a simple, engineered, cost-effective solution that helps eliminate multiple job-site hazards at once—protecting workers and equipment, minimizing the risk of costly shutdowns and interruptions, and supporting OSHA and workplace safety compliance.';
       p0.dataset.agfxCopyReplaced = 'product-intro';
     }
     if (p1) {
-      // Client-provided exact copy (2026-07-24).
       p1.textContent =
-        'Arc Guard Inc. is a Service-Disabled Veteran Owned Small Business (SDVOSB) founded in 2024 to bring new innovation in safety to the people who mean the most — “The Front Line.”';
+        'Arc Guard Inc. is a Service-Disabled Veteran-Owned Small Business (SDVOSB) founded to bring new safety innovations to the people who matter most—“The Front Line.” Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
       p1.dataset.agfxCopyReplaced = 'product-intro-2';
     }
+  };
+
+  // Client 2026-07-29: place the exact patent sentence at the end of the
+  // second "Who We Are" paragraph and remove the standalone logo band above
+  // "Resonate with our Story?" so the About page is substantially shorter.
+  const updateAboutPage = () => {
+    if (pageKey !== 'about') return;
+    const root = document.querySelector('.elementor-14346') || document.body;
+    const whoWeAre = document.querySelector('.elementor-element-03f299e');
+    const paragraphs = [...(whoWeAre || root).querySelectorAll('p')]
+      .filter(p => p.textContent.trim());
+    const patentSentence = 'Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
+    const second = paragraphs[1];
+    if (second && !second.textContent.includes(patentSentence)) {
+      second.textContent = `${second.textContent.trim()} ${patentSentence}`;
+      second.dataset.agfxCopyReplaced = 'about-patent';
+    }
+    document.querySelector('.elementor-element-9bcbf9c')?.classList.add('agfx-removed');
+  };
+
+  // Client 2026-07-29: rebuild Contact around the requested sentence-case
+  // hero, lead form, company address and centered social links. The source
+  // contact strip stays in the DOM for rollback/media parity but is hidden.
+  const updateContactPage = () => {
+    if (pageKey !== 'contact' || document.querySelector('.agfx-contact-panel')) return;
+
+    const heroTitle = document.querySelector('.elementor-element-578202f .elementor-heading-title');
+    const heroText = document.querySelector('.elementor-element-de40947 .elementor-heading-title');
+    const consult = document.querySelector('.elementor-element-9edcd5c .elementor-button-text');
+    if (heroTitle) {
+      heroTitle.textContent = 'Want to explore safety assessment for your facility?';
+      heroTitle.dataset.agfxCopyReplaced = 'contact-hero-title';
+    }
+    if (heroText) {
+      heroText.textContent =
+        'Connect with us today by clicking the link below to see how we can secure your sight today!';
+      heroText.dataset.agfxCopyReplaced = 'contact-hero-text';
+    }
+    if (consult) consult.textContent = 'Schedule A Consult';
+
+    const sourceStrip = document.querySelector('.elementor-element-0618a07');
+    if (!sourceStrip) return;
+    const socialLinks = [...sourceStrip.querySelectorAll('.elementor-element-5426418 a[href]')]
+      .map(anchor => anchor.cloneNode(true));
+
+    const panel = document.createElement('section');
+    panel.className = 'agfx-contact-panel';
+    panel.dataset.agfxInjected = 'contact-form';
+    panel.setAttribute('aria-labelledby', 'agfx-contact-title');
+    panel.innerHTML = `
+      <div class="agfx-contact-panel__inner">
+        <div class="agfx-contact-form-wrap">
+          <p class="agfx-contact-form__eyebrow">Contact Us Form</p>
+          <h2 id="agfx-contact-title">Contact Us</h2>
+          <form class="agfx-contact-form" novalidate>
+            <div class="agfx-contact-form__grid">
+              <label><span>First Name</span><input name="first_name" autocomplete="given-name" required></label>
+              <label><span>Last Name</span><input name="last_name" autocomplete="family-name" required></label>
+              <label><span>Company Name</span><input name="company" autocomplete="organization" required></label>
+              <label><span>Position</span><input name="position" autocomplete="organization-title"></label>
+              <label><span>Phone Number</span><input name="phone" type="tel" autocomplete="tel"></label>
+              <label><span>Email Address</span><input name="email" type="email" autocomplete="email" required></label>
+              <label class="agfx-contact-form__full"><span>Website</span><input name="website" type="url" autocomplete="url" inputmode="url"></label>
+              <label class="agfx-contact-form__full"><span>Comments</span><textarea name="comments" rows="6"></textarea></label>
+              <label class="agfx-contact-form__trap" aria-hidden="true"><span>Leave blank</span><input name="company_website_confirm" tabindex="-1" autocomplete="off"></label>
+            </div>
+            <div class="agfx-contact-form__actions">
+              <button class="agfx-button" type="submit">Contact Us</button>
+              <p class="agfx-contact-form__status" role="status" aria-live="polite" hidden></p>
+            </div>
+          </form>
+        </div>
+        <aside class="agfx-contact-details">
+          <div>
+            <p class="agfx-contact-details__eyebrow">Company Address</p>
+            <address>11616 Industriplex Blvd, Suite 18,<br>Baton Rouge, LA 70809</address>
+          </div>
+          <div class="agfx-contact-social">
+            <h2>Follow Us on Social Media</h2>
+            <div class="agfx-contact-social__links"></div>
+          </div>
+        </aside>
+      </div>`;
+
+    const socialTarget = panel.querySelector('.agfx-contact-social__links');
+    socialLinks.forEach(anchor => {
+      if (/linkedin\.com/i.test(anchor.href)) anchor.setAttribute('aria-label', 'Arc Guard on LinkedIn');
+      if (/facebook\.com/i.test(anchor.href)) anchor.setAttribute('aria-label', 'Arc Guard on Facebook');
+      socialTarget.append(anchor);
+    });
+    sourceStrip.classList.add('agfx-contact-source-hidden');
+    sourceStrip.after(panel);
+
+    const form = panel.querySelector('.agfx-contact-form');
+    const status = panel.querySelector('.agfx-contact-form__status');
+    window.__AGFX_CONTACT = {
+      recipients: [...CONTACT_EMAILS],
+      mode: window.arcguardFaceliftContact?.ajaxUrl && window.arcguardFaceliftContact?.nonce
+        ? 'server'
+        : 'addressed-email'
+    };
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = new FormData(form);
+      if (data.get('company_website_confirm')) return;
+
+      const submit = form.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      status.hidden = true;
+      try {
+        const config = window.arcguardFaceliftContact || {};
+        if (config.ajaxUrl && config.nonce) {
+          data.append('action', 'arcguard_facelift_contact');
+          data.append('nonce', config.nonce);
+          const response = await fetch(config.ajaxUrl, {
+            method: 'POST',
+            body: data,
+            credentials: 'same-origin'
+          });
+          const result = await response.json();
+          if (!response.ok || !result.success) throw new Error('contact-send-failed');
+          form.reset();
+          status.textContent = 'Thank you. Your message has been sent.';
+          status.hidden = false;
+          trackEvent('generate_lead', { method: 'contact_form' });
+        } else {
+          const lines = [
+            `First Name: ${data.get('first_name') || ''}`,
+            `Last Name: ${data.get('last_name') || ''}`,
+            `Company Name: ${data.get('company') || ''}`,
+            `Position: ${data.get('position') || ''}`,
+            `Phone Number: ${data.get('phone') || ''}`,
+            `Email Address: ${data.get('email') || ''}`,
+            `Website: ${data.get('website') || ''}`,
+            '',
+            'Comments:',
+            data.get('comments') || ''
+          ];
+          const mailto =
+            `mailto:${CONTACT_EMAILS.join(',')}?subject=${encodeURIComponent('Arc Guard Contact Us Form')}` +
+            `&body=${encodeURIComponent(lines.join('\n'))}`;
+          window.location.href = mailto;
+          trackEvent('generate_lead', { method: 'contact_form_email' });
+        }
+      } catch {
+        status.textContent = 'Please email info@arcguardinc.com.';
+        status.hidden = false;
+      } finally {
+        submit.disabled = false;
+      }
+    });
   };
 
   // Styling hook only — the footer keeps exactly the content WordPress renders.
@@ -940,12 +1092,14 @@
 
   applyPatentedCopy();
   dedupeProductIntro();
+  updateAboutPage();
   hideRemovedHomeSections();
   equalizeIndustryCards();
   refineResourcePostImages();
   improveMediaSemantics();
   manageHomeEmptyCarousel();
   improveLinksAndActions();
+  updateContactPage();
   retargetFaqDocumentLinks();
   injectFaqAccess();
   injectComplianceSection();
