@@ -2756,11 +2756,18 @@ body.agfx-facelift.agfx-page-contact .elementor-element-49cdf40 {
   align-items: stretch !important;
 }
 
+body.agfx-facelift.agfx-page-contact .elementor-element-49cdf40 {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 body.agfx-facelift.agfx-page-contact :where(
   .elementor-element-578202f,
   .elementor-element-de40947,
   .elementor-element-9edcd5c) {
   --width: 100%;
+  flex: 0 0 auto !important;
+  align-self: stretch !important;
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
@@ -2795,7 +2802,11 @@ body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c {
 }
 
 body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c .elementor-button {
+  display: flex !important;
+  width: min(100%, 250px);
+  max-width: 100%;
   min-width: 230px;
+  margin-inline: auto;
   justify-content: center;
   white-space: nowrap;
 }
