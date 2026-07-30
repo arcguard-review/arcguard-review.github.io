@@ -771,7 +771,7 @@
     }
     if (p1) {
       p1.textContent =
-        'Arc Guard Inc. is a Service-Disabled Veteran-Owned Small Business (SDVOSB) founded to bring new safety innovations to the people who matter most—“The Front Line.” Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
+        'Arc Guard Inc. is a Service-Disabled Veteran-Owned Small Business (SDVOSB) founded to bring new safety innovations to the people who matter most—"The Front Line." Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
       p1.dataset.agfxCopyReplaced = 'product-intro-2';
     }
   };
