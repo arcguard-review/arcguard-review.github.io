@@ -794,12 +794,11 @@
     document.querySelector('.elementor-element-9bcbf9c')?.classList.add('agfx-removed');
   };
 
-  // Reserve and begin loading the photographed Industries content before it
-  // reaches the viewport. This prevents large blank bands in screenshots and
-  // avoids a visible page-height jump as a visitor scrolls through the cards.
+  // Reserve and begin loading page imagery before it reaches the viewport.
+  // This prevents blank bands in full-page screenshots and avoids a visible
+  // page-height jump as a visitor reaches image-heavy sections.
   const stabilizeStageMedia = () => {
-    if (pageKey !== 'industries') return;
-    for (const image of document.querySelectorAll('.elementor-556 img[loading="lazy"]')) {
+    for (const image of document.querySelectorAll('.entry-content img[loading="lazy"]')) {
       image.loading = 'eager';
       image.setAttribute('loading', 'eager');
     }
