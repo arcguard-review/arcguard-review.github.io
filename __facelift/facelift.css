@@ -586,8 +586,10 @@ body.agfx-facelift.agfx-page-industries .elementor-556 {
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-0301515 {
-  min-height: clamp(430px, 62vw, 720px);
+  min-height: clamp(360px, 48vw, 560px);
   padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 6vw, 5rem) !important;
+  background-color: var(--agfx-ink) !important;
+  background-image: linear-gradient(135deg, #0b0b0b 0%, #1a1816 58%, #11100f 100%) !important;
   background-position: center !important;
   background-size: cover !important;
   color: #fff !important;
@@ -2619,9 +2621,29 @@ body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 {
 }
 body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5),
 body.agfx-facelift.agfx-page-contact :where(.elementor-element-aff048a, .elementor-element-f9941b5) iframe {
-  height: 300px !important;
-  min-height: 300px !important;
-  max-height: 300px !important;
+  height: clamp(190px, 18vw, 240px) !important;
+  min-height: clamp(190px, 18vw, 240px) !important;
+  max-height: 240px !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-aff048a {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  line-height: 0 !important;
+  background: #0b0b0b !important;
+}
+
+body.agfx-facelift.agfx-page-contact .elementor-element-f9941b5,
+body.agfx-facelift.agfx-page-contact .elementor-element-f9941b5 .elementor-custom-embed {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  line-height: 0 !important;
+  background: #0b0b0b !important;
 }
 
 /* ============================================================
@@ -2693,6 +2715,198 @@ body.agfx-facelift.agfx-page-industries :where(
   padding-bottom: clamp(2.25rem, 3.5vw, 3.25rem) !important;
 }
 
+/* 2026-08-01 visual hardening: the three Industries detail sections inherit
+   Elementor container variables that can collapse their wrappers to inline
+   fragments. Normalize the outer surface and rebuild the existing image/text
+   pairs as one predictable responsive grid without changing any copy. */
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-d4e4f07,
+  .elementor-element-748a353,
+  .elementor-element-953feb9) {
+  --padding-top: 0px !important;
+  --padding-right: 0px !important;
+  --padding-bottom: 0px !important;
+  --padding-left: 0px !important;
+  --overflow: hidden !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate;
+  background-color: var(--agfx-ink) !important;
+  background-image: linear-gradient(var(--agfx-ink), var(--agfx-ink)) !important;
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-d4e4f07,
+  .elementor-element-748a353,
+  .elementor-element-953feb9) > .e-con-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: clamp(1.5rem, 3vw, 2.5rem) !important;
+  width: min(100%, 74rem) !important;
+  max-width: 74rem !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-41b8041,
+  .elementor-element-bb1e0b9,
+  .elementor-element-71e05b3) {
+  --margin-top: 0px !important;
+  --margin-right: 0px !important;
+  --margin-bottom: 0px !important;
+  --margin-left: 0px !important;
+  --padding-top: 0px !important;
+  --padding-right: 0px !important;
+  --padding-bottom: 0px !important;
+  --padding-left: 0px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: clamp(1.5rem, 3vw, 2.5rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-827e8d2,
+  .elementor-element-8d0ad7e,
+  .elementor-element-463a97a) {
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  transform: none !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-6aab40d,
+  .elementor-element-fde2816,
+  .elementor-element-b3d7a82) {
+  --margin-top: 0px !important;
+  --margin-right: 0px !important;
+  --margin-bottom: 0px !important;
+  --margin-left: 0px !important;
+  --padding-top: 0px !important;
+  --padding-right: 0px !important;
+  --padding-bottom: 0px !important;
+  --padding-left: 0px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(2rem, 5vw, 4.5rem) !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-1dce004,
+  .elementor-element-62a07a3,
+  .elementor-element-768e8f0,
+  .elementor-element-8f4ca83,
+  .elementor-element-7718538,
+  .elementor-element-f30d9b2) {
+  --margin-top: 0px !important;
+  --margin-right: 0px !important;
+  --margin-bottom: 0px !important;
+  --margin-left: 0px !important;
+  --padding-top: 0px !important;
+  --padding-right: 0px !important;
+  --padding-bottom: 0px !important;
+  --padding-left: 0px !important;
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-1dce004,
+  .elementor-element-62a07a3,
+  .elementor-element-768e8f0) {
+  display: block !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-8f4ca83,
+  .elementor-element-7718538,
+  .elementor-element-f30d9b2) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: 1.5rem !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-d4e4f07,
+  .elementor-element-748a353,
+  .elementor-element-953feb9) :is(h2, h3, p, li, span) {
+  color: var(--agfx-cream) !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-d4e4f07,
+  .elementor-element-748a353,
+  .elementor-element-953feb9) img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 250px !important;
+  max-height: 430px !important;
+  aspect-ratio: 16 / 10;
+  object-fit: cover !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-503d1b9,
+  .elementor-element-6987896,
+  .elementor-element-4bd2220) {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+@media (max-width: 900px) {
+  body.agfx-facelift.agfx-page-industries :is(
+    .elementor-element-6aab40d,
+    .elementor-element-fde2816,
+    .elementor-element-b3d7a82) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.75rem !important;
+  }
+}
+
 /* ABOUT — remove the entire standalone logo band directly above "Resonate
    with our Story?" and tighten the remaining call-to-action section. */
 body.agfx-facelift.agfx-page-about .elementor-element-9bcbf9c {
@@ -2706,6 +2920,131 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b {
   padding-top: clamp(2.5rem, 4.5vw, 3.75rem) !important;
   padding-bottom: clamp(2.5rem, 4.5vw, 3.75rem) !important;
+}
+
+/* 2026-08-01 visual hardening: Elementor's generated container variables can
+   resolve these closing Product CTA nodes to `display: inline`. That makes the
+   message paint as narrow fragments at the left edge while the section's
+   source cream background shows through. Give the CTA one explicit layout and
+   paint surface at every viewport width. */
+body.agfx-facelift.agfx-page-product .elementor-element-27d67cc {
+  --padding-top: 0px !important;
+  --padding-right: 0px !important;
+  --padding-bottom: 0px !important;
+  --padding-left: 0px !important;
+  --overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  isolation: isolate;
+  background-color: var(--agfx-ink) !important;
+  background-image: linear-gradient(var(--agfx-ink), var(--agfx-ink)) !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-27d67cc > .e-con-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: clamp(1.5rem, 3vw, 2.5rem) !important;
+  width: min(100%, 72rem) !important;
+  max-width: 72rem !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-product :where(
+  .elementor-element-90975b7,
+  .elementor-element-07ed396,
+  .elementor-element-731fd5c,
+  .elementor-element-5244640) {
+  position: static !important;
+  inset: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  transform: none !important;
+  background: transparent !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-07ed396 .elementor-heading-title {
+  width: 100% !important;
+  max-width: 58ch !important;
+  margin: 0 auto !important;
+  color: var(--agfx-cream) !important;
+  text-align: center !important;
+  text-wrap: balance;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-5244640 .elementor-button {
+  margin-inline: auto !important;
+}
+
+/* The About Mission container exhibited a Chromium/Elementor paint gap in its
+   lower padding corner at large desktop widths. A dedicated inset paint layer
+   keeps the entire section dark while preserving the existing content grid. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate;
+  background-color: var(--agfx-ink) !important;
+  background-image: linear-gradient(var(--agfx-ink), var(--agfx-ink)) !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  background: var(--agfx-ink) !important;
+  pointer-events: none;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-174785ce {
+  order: 0 !important;
+  grid-column: 1 !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-351d0abe {
+  order: 1 !important;
+  grid-column: 2 !important;
+}
+
+@media (max-width: 900px) {
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-174785ce,
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-351d0abe {
+    grid-column: 1 !important;
+  }
+
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-351d0abe {
+    order: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-174785ce {
+    order: 1 !important;
+  }
 }
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa {
@@ -3002,5 +3341,194 @@ body.agfx-facelift.agfx-page-contact .agfx-contact-social__links a:hover {
 
   body.agfx-facelift.agfx-page-contact .agfx-contact-form__actions .agfx-button {
     width: 100%;
+  }
+}
+
+/* Final phone-only spacing pass from the annotated mobile review.
+   Keep tablet/desktop geometry unchanged. */
+@media (max-width: 767px) {
+  /* HOME — remove inherited Elementor height/padding between the hero video,
+     the intro headline, and the problem cards. */
+  body.agfx-facelift.agfx-page-home .elementor-element-8b16c9e {
+    padding: 2rem 1.25rem 2.5rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-8b16c9e > .e-con-inner {
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home :where(
+    .elementor-element-2405bdd,
+    .elementor-element-1ffdab6,
+    .elementor-element-36b331e) {
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-2405bdd {
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home :where(
+    .elementor-element-1ffdab6,
+    .elementor-element-36b331e) {
+    padding: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-36b331e {
+    gap: 1.25rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-4487355 {
+    margin: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-269eae5 {
+    margin: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-156a7ec {
+    margin: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-dc6600f {
+    padding: 2.5rem 1.25rem 1rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 {
+    padding: 0 1.25rem 2.5rem !important;
+  }
+
+  /* CONTACT — retain the requested logo/copy arrangement with a denser phone
+     composition and a centered, non-wrapping CTA. */
+  body.agfx-facelift.agfx-page-contact .elementor-element-898bff1 {
+    gap: 1.25rem !important;
+    padding: 1.75rem 1.25rem 2.25rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-a7bc327 {
+    padding: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 {
+    width: min(58vw, 220px) !important;
+    padding: 1rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-4bba9d1 img {
+    width: min(42vw, 150px) !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-49cdf40 {
+    padding: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-578202f .elementor-heading-title {
+    font-size: clamp(1.85rem, 8.5vw, 2.25rem) !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-de40947 {
+    margin-top: 0.9rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-de40947 .elementor-heading-title {
+    font-size: 1rem !important;
+    line-height: 1.45 !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c {
+    margin-top: 1.25rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c .elementor-button {
+    width: min(100%, 250px) !important;
+    min-width: 0 !important;
+  }
+
+  /* ABOUT + shared bottom banners — eliminate padded black bands around the
+     banner artwork and the theme's trailing 100px page pad on phones. */
+  body.agfx-facelift.agfx-page-about #content {
+    padding-bottom: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-about .entry-footer {
+    margin-top: 0 !important;
+  }
+
+  body.agfx-facelift :where(
+    .elementor-element-15985c7,
+    .elementor-element-23097aa,
+    .elementor-element-990cc9e,
+    .elementor-element-1c2518a) {
+    display: block !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+    background: #000 !important;
+  }
+
+  body.agfx-facelift :where(
+    .elementor-element-15985c7,
+    .elementor-element-23097aa,
+    .elementor-element-990cc9e,
+    .elementor-element-1c2518a) .elementor-widget-image,
+  body.agfx-facelift :where(
+    .elementor-element-15985c7,
+    .elementor-element-23097aa,
+    .elementor-element-990cc9e,
+    .elementor-element-1c2518a) .elementor-widget-container {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+  }
+
+  body.agfx-facelift :where(
+    .elementor-element-15985c7,
+    .elementor-element-23097aa,
+    .elementor-element-990cc9e,
+    .elementor-element-1c2518a) img {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-element-385c98b {
+    display: none !important;
+  }
+
+  /* Specificity guards for source rules that include Elementor page IDs. */
+  body.agfx-facelift.agfx-page-home .elementor-14043 > .elementor-element-8b16c9e {
+    padding: 2rem 1.25rem 2.5rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-14043 > .elementor-element-dc6600f {
+    padding: 2.5rem 1.25rem 1rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-home .elementor-14043 > .elementor-element-c4d87b7 {
+    padding: 0 1.25rem 2.5rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-898bff1 .elementor-element-4bba9d1 {
+    width: min(58vw, 220px) !important;
+    padding: 1rem !important;
+  }
+
+  body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa,
+  body.agfx-facelift.agfx-page-home .elementor-14043 .elementor-element-15985c7,
+  body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-990cc9e,
+  body.agfx-facelift.agfx-page-contact .elementor-553 .elementor-element-1c2518a {
+    display: block !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }

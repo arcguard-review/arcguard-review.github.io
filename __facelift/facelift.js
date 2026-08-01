@@ -814,6 +814,15 @@
     }
     if (consult) consult.textContent = 'Schedule A Consult';
 
+    // Load the preserved company map immediately so its compact slot never
+    // appears as a large, differently colored empty band while scrolling.
+    const mapFrame = document.querySelector('.elementor-element-f9941b5 iframe');
+    if (mapFrame) {
+      mapFrame.loading = 'eager';
+      mapFrame.setAttribute('loading', 'eager');
+      mapFrame.referrerPolicy = 'no-referrer-when-downgrade';
+    }
+
     const sourceStrip = document.querySelector('.elementor-element-0618a07');
     if (!sourceStrip) return;
     const socialLinks = [...sourceStrip.querySelectorAll('.elementor-element-5426418 a[href]')]
