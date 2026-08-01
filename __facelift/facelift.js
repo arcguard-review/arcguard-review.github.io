@@ -794,6 +794,17 @@
     document.querySelector('.elementor-element-9bcbf9c')?.classList.add('agfx-removed');
   };
 
+  // Reserve and begin loading the photographed Industries content before it
+  // reaches the viewport. This prevents large blank bands in screenshots and
+  // avoids a visible page-height jump as a visitor scrolls through the cards.
+  const stabilizeStageMedia = () => {
+    if (pageKey !== 'industries') return;
+    for (const image of document.querySelectorAll('.elementor-556 img[loading="lazy"]')) {
+      image.loading = 'eager';
+      image.setAttribute('loading', 'eager');
+    }
+  };
+
   // Client 2026-07-29: rebuild Contact around the requested sentence-case
   // hero, lead form, company address and centered social links. The source
   // contact strip stays in the DOM for rollback/media parity but is hidden.
@@ -821,6 +832,33 @@
       mapFrame.loading = 'eager';
       mapFrame.setAttribute('loading', 'eager');
       mapFrame.referrerPolicy = 'no-referrer-when-downgrade';
+      // The legacy Google endpoint intermittently renders an empty black
+      // frame on the static review origin. Preserve the iframe for rollback,
+      // but render a deterministic linked OpenStreetMap preview so the map is
+      // always visible in Chrome, screenshots, and privacy-restricted modes.
+      mapFrame.classList.add('agfx-map-source');
+      const embed = mapFrame.closest('.elementor-custom-embed');
+      if (embed && !embed.querySelector('.agfx-map-preview')) {
+        const preview = document.createElement('a');
+        preview.className = 'agfx-map-preview';
+        preview.dataset.agfxInjected = 'contact-map-preview';
+        preview.href =
+          'https://www.openstreetmap.org/?mlat=30.3856367&mlon=-91.0528117#map=15/30.3856367/-91.0528117';
+        preview.target = '_blank';
+        preview.rel = 'noopener noreferrer';
+        preview.setAttribute('aria-label', 'View the Arc Guard company address on a larger map');
+        preview.innerHTML = `
+          <span class="agfx-map-preview__canvas" aria-hidden="true">
+            <span class="agfx-map-preview__road road-a"></span>
+            <span class="agfx-map-preview__road road-b"></span>
+            <span class="agfx-map-preview__road road-c"></span>
+            <span class="agfx-map-preview__road road-d"></span>
+          </span>
+          <span class="agfx-map-preview__marker" aria-hidden="true"></span>
+          <span class="agfx-map-preview__label">Arc Guard Inc.<small>11616 Industriplex Blvd, Suite 18</small></span>
+          <span class="agfx-map-preview__attribution">View larger map ↗</span>`;
+        embed.append(preview);
+      }
     }
 
     const sourceStrip = document.querySelector('.elementor-element-0618a07');
@@ -1102,6 +1140,7 @@
   applyPatentedCopy();
   dedupeProductIntro();
   updateAboutPage();
+  stabilizeStageMedia();
   hideRemovedHomeSections();
   equalizeIndustryCards();
   refineResourcePostImages();
