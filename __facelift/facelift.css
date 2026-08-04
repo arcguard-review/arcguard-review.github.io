@@ -4382,3 +4382,29 @@ body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59
 body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-bd2062a .elementor-heading-title {
   color: var(--agfx-ink) !important;
 }
+
+/* --------------------------------------------------------------------------
+   2026-08-03 adversarial-review follow-ups (both caused by the fixes above)
+   -------------------------------------------------------------------------- */
+
+/* Restoring the cream band removed the only thing separating the paper cards
+   from their background: against #575555 the cards read at 7.1:1, against cream
+   they read at 1.10:1. The approved pre-regression build gave each card a
+   hairline plus a red top rule (see line ~870), but a later `border: 0
+   !important` reset — added to kill Hazard pseudo-lines — outranked it. Restore
+   the approved card edge with enough weight to survive that reset. */
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e > .e-con-inner > .e-con {
+  border: 1px solid var(--agfx-rule) !important;
+  border-top: 4px solid var(--agfx-red) !important;
+}
+
+/* Dropping the hero subtitle's panel also dropped its width cap, so below the
+   two-column breakpoint the measure ran to ~108 characters with a two-word
+   runt. 38rem matches the 608px column the subtitle occupies at desktop. */
+@media (max-width: 1024px) {
+  body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-0301515 .e-15b7209-0a94cf0,
+  body.agfx-facelift.agfx-page-industries .elementor-556 p.e-15b7209-0a94cf0 {
+    max-width: min(100%, 38rem) !important;
+    margin-inline: auto !important;
+  }
+}
