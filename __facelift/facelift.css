@@ -1523,23 +1523,26 @@ body.agfx-facelift.agfx-page-industries .elementor-556 .e-15b7209-0a94cf0 {
   text-align: left !important;
 }
 
+/* Who We Serve is a CREAM band, matching every other cream section on the site.
+   The 2026-08-01 round introduced #575555 here; that was a regression the client
+   caught. Cream + ink is the approved treatment — see the cream guard at EOF. */
 body.agfx-facelift.agfx-page-industries .elementor-element-bd2062a {
   padding: var(--agfx-space-xl) 1.25rem var(--agfx-space-md) !important;
-  background: #575555 !important;
-  color: var(--agfx-cream) !important;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-bd2062a .elementor-heading-title {
   margin: 0 !important;
-  color: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
   font-size: clamp(1.75rem, 3vw, 2.4rem) !important;
   text-align: center !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e {
   padding: var(--agfx-space-md) clamp(1.25rem, 5vw, 4rem) var(--agfx-space-2xl) !important;
-  background: #575555 !important;
-  color: var(--agfx-cream) !important;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e > .e-con-inner {
@@ -1668,8 +1671,8 @@ body.agfx-facelift.agfx-page-industries :is(
   .elementor-element-748a353,
   .elementor-element-953feb9) {
   padding: var(--agfx-space-2xl) clamp(1.25rem, 5vw, 4rem) !important;
-  background-color: #575555 !important;
-  background-image: linear-gradient(#575555, #575555) !important;
+  background-color: var(--agfx-ink) !important;
+  background-image: linear-gradient(var(--agfx-ink), var(--agfx-ink)) !important;
   color: var(--agfx-cream) !important;
 }
 
@@ -3853,6 +3856,9 @@ body.agfx-facelift.agfx-page-contact .elementor-element-de40947 .elementor-headi
   text-transform: none !important;
 }
 
+/* Contact CTA centred — authored by Corban in the review clone on 2026-08-03
+   ("Center contact page CTA", b6fd4b5) and ported back into the canonical layer
+   so the next snapshot cannot silently revert his work. */
 body.agfx-facelift.agfx-page-contact .elementor-element-9edcd5c {
   display: flex !important;
   justify-content: center !important;
@@ -4338,4 +4344,41 @@ body.agfx-facelift.agfx-page-about .elementor-element-762c5d8 h3 {
   width: 100% !important;
   margin-inline: 0 !important;
   text-align: left !important;
+}
+
+/* ==========================================================================
+   FINAL GUARDS — physical end of stylesheet (2026-08-03)
+   Anything below must beat both Elementor page-ID rules and every earlier
+   facelift block. Verify with getComputedStyle, never by source position.
+   ========================================================================== */
+
+/* INDUSTRIES HERO — the subtitle is an Elementor atomic paragraph that ships a
+   solid black background, a stretched height, and align-items:end, so the copy
+   sat pinned to the bottom of a tall black slab covering the welder photo.
+   Collapse it to its content, drop the black so the photograph reads through
+   the hero's own dark gradient, and centre it against the headline column.
+   Text stays legible via a shadow rather than an opaque panel. */
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-0301515 .e-15b7209-0a94cf0,
+body.agfx-facelift.agfx-page-industries .elementor-556 p.e-15b7209-0a94cf0 {
+  align-self: center !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.75) !important;
+}
+
+/* INDUSTRIES CREAM BANDS — Who We Serve (heading band + card band) must render
+   cream, never the #575555 grey a previous round introduced. Page-ID scoped so
+   it outranks Elementor's generated per-page rules. */
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-bd2062a,
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e {
+  background-color: var(--agfx-cream) !important;
+  background-image: none !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-bd2062a .elementor-heading-title {
+  color: var(--agfx-ink) !important;
 }
