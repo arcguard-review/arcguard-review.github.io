@@ -124,7 +124,17 @@ body.agfx-facelift.agfx-page-about .elementor-element-762c5d8,
 body.agfx-facelift.agfx-page-about .elementor-element-762c5d8 h3 {
   width: 100% !important;
   margin-inline: 0 !important;
-  text-align: left !important;
+  text-align: center !important;
+}
+
+body.agfx-facelift.agfx-page-about :where(.elementor-element-762c5d8, .elementor-element-adce7d2) h3::after {
+  margin-inline: auto !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
+  width: min(100%, 54ch) !important;
+  margin-inline: 0 !important;
+  text-align: center !important;
 }
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa,
@@ -3390,8 +3400,9 @@ body.agfx-facelift.agfx-page-about .entry-header :where(h1, h2) {
 }
 body.agfx-facelift.agfx-page-about .page-header,
 body.agfx-facelift.agfx-page-about .entry-header {
-  padding-top: 2rem !important;
-  padding-bottom: 0.5rem !important;
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 body.agfx-facelift.agfx-page-about .elementor-14346 > :where(.e-con, .elementor-section):first-child {
   padding-top: 1.25rem !important;
@@ -3718,8 +3729,8 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 
 }
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b {
-  padding-top: clamp(2.5rem, 4.5vw, 3.75rem) !important;
-  padding-bottom: clamp(2.5rem, 4.5vw, 3.75rem) !important;
+  padding-top: clamp(1.575rem, 2.925vw, 2.475rem) !important;
+  padding-bottom: clamp(1.575rem, 2.925vw, 2.475rem) !important;
 }
 
 /* 2026-08-01 visual hardening: Elementor's generated container variables can
@@ -4419,5 +4430,15 @@ body.agfx-facelift.agfx-page-about .elementor-element-762c5d8,
 body.agfx-facelift.agfx-page-about .elementor-element-762c5d8 h3 {
   width: 100% !important;
   margin-inline: 0 !important;
-  text-align: left !important;
+  text-align: center !important;
+}
+
+body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
+  width: min(100%, 54ch) !important;
+  margin-inline: 0 !important;
+  text-align: center !important;
+}
+
+body.agfx-facelift.agfx-page-about :where(.elementor-element-762c5d8, .elementor-element-adce7d2) h3::after {
+  margin-inline: auto !important;
 }
