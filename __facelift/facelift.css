@@ -1497,10 +1497,15 @@ body.agfx-facelift.agfx-page-product .elementor-element-07ed396 .elementor-headi
 /* INDUSTRIES — restore the coherent original page structure: real hero image,
    three equal application cards, and compact two-column detail rows. */
 body.agfx-facelift.agfx-page-industries .elementor-element-0301515 {
+  position: relative !important;
+  isolation: isolate;
   min-height: 0 !important;
   padding: var(--agfx-space-3xl) clamp(1.25rem, 6vw, 5rem) !important;
   background-color: var(--agfx-ink) !important;
-  background-image: linear-gradient(rgba(11, 11, 11, 0.38), rgba(11, 11, 11, 0.62)), url("https://i0.wp.com/www.arcguardinc.com/wp-content/uploads/2026/06/welder-background-1-scaled.jpg?fit=1024%2C680&ssl=1") !important;
+  background-image:
+    linear-gradient(90deg, rgba(17, 16, 15, 0.98) 0%, rgba(17, 16, 15, 0.86) 24%, rgba(17, 16, 15, 0.42) 52%, rgba(17, 16, 15, 0.72) 78%, rgba(17, 16, 15, 0.94) 100%),
+    linear-gradient(rgba(11, 11, 11, 0.28), rgba(11, 11, 11, 0.56)),
+    url("https://i0.wp.com/www.arcguardinc.com/wp-content/uploads/2026/06/welder-background-1-scaled.jpg?fit=1024%2C680&ssl=1") !important;
   background-position: center 24% !important;
   background-size: cover !important;
 }
@@ -1516,7 +1521,7 @@ body.agfx-facelift.agfx-page-industries .elementor-element-536aa93 {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
   gap: var(--agfx-space-3xl) !important;
-  align-items: start !important;
+  align-items: stretch !important;
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
@@ -1543,25 +1548,33 @@ body.agfx-facelift.agfx-page-industries .elementor-556 .e-15b7209-0a94cf0 {
   font-size: clamp(1rem, 1.4vw, 1.2rem) !important;
   line-height: 1.55 !important;
   text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100% !important;
+  padding: clamp(1.5rem, 3vw, 2.5rem) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.88) !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-bd2062a {
   padding: var(--agfx-space-xl) 1.25rem var(--agfx-space-md) !important;
-  background: #575555 !important;
-  color: var(--agfx-cream) !important;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-bd2062a .elementor-heading-title {
   margin: 0 !important;
-  color: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
   font-size: clamp(1.75rem, 3vw, 2.4rem) !important;
   text-align: center !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e {
   padding: var(--agfx-space-md) clamp(1.25rem, 5vw, 4rem) var(--agfx-space-2xl) !important;
-  background: #575555 !important;
-  color: var(--agfx-cream) !important;
+  background: var(--agfx-cream) !important;
+  color: var(--agfx-ink) !important;
 }
 
 body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e > .e-con-inner {
@@ -3637,6 +3650,20 @@ body.agfx-facelift.agfx-page-industries :is(
   align-items: stretch !important;
   justify-content: center !important;
   gap: 1.5rem !important;
+}
+
+body.agfx-facelift.agfx-page-industries :is(
+  .elementor-element-8f4ca83,
+  .elementor-element-7718538,
+  .elementor-element-f30d9b2) :where(
+  .elementor-widget-icon-box,
+  .elementor-icon-box-wrapper,
+  .elementor-icon-box-content,
+  .elementor-widget-container) {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  text-align: center !important;
 }
 
 body.agfx-facelift.agfx-page-industries :is(
