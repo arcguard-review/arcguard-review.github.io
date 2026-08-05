@@ -61,6 +61,11 @@ body.agfx-facelift :where(
   background: #000 !important;
 }
 
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 body.agfx-facelift :where(
   .elementor-element-15985c7,
   .elementor-element-23097aa,
@@ -942,8 +947,13 @@ body.agfx-facelift.agfx-page-industries :where(.elementor-element-d4e4f07, .elem
 
 /* Resources: keep every current post and image instance. */
 body.agfx-facelift.agfx-page-resources #content {
-  padding: clamp(3.5rem, 7vw, 7rem) clamp(1.25rem, 5vw, 4.5rem);
+  padding: 0 clamp(1.25rem, 5vw, 4.5rem) 0;
   background: var(--agfx-ink);
+  flex: 0 0 auto !important;
+}
+
+body.agfx-facelift.agfx-page-resources #page {
+  min-height: 0 !important;
 }
 
 body.agfx-facelift.agfx-page-resources #primary {
@@ -3860,8 +3870,8 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-351d0abe 
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-23097aa {
   min-height: 0 !important;
-  padding-top: 1.25rem !important;
-  padding-bottom: 1.25rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-253bda3 {
