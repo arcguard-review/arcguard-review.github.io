@@ -452,6 +452,31 @@
     const answers = [];
     let current = 0;
     const lead = {};
+    let opener = null;
+    let backgroundState = [];
+
+    const lockBackground = () => {
+      backgroundState = [...document.body.children]
+        .filter(element => element !== overlay)
+        .map(element => ({
+          element,
+          inert: element.inert,
+          ariaHidden: element.getAttribute('aria-hidden')
+        }));
+      backgroundState.forEach(({ element }) => {
+        element.inert = true;
+        element.setAttribute('aria-hidden', 'true');
+      });
+    };
+
+    const unlockBackground = () => {
+      backgroundState.forEach(({ element, inert, ariaHidden }) => {
+        element.inert = inert;
+        if (ariaHidden === null) element.removeAttribute('aria-hidden');
+        else element.setAttribute('aria-hidden', ariaHidden);
+      });
+      backgroundState = [];
+    };
 
     const renderQuestion = () => {
       const q = ASSESSMENT.questions[current];
@@ -540,29 +565,55 @@
       renderResults();
     });
 
-    const open = () => {
+    const open = trigger => {
+      opener = trigger || document.activeElement;
       overlay.hidden = false;
       document.body.classList.add('agfx-assess-open');
+      lockBackground();
       answers.length = 0;
       current = 0;
       show('intro');
+      requestAnimationFrame(() => overlay.querySelector('.agfx-assess__start')?.focus());
       trackEvent('assessment_open', { method: 'compliance_assessment' });
     };
     const close = () => {
       overlay.hidden = true;
       document.body.classList.remove('agfx-assess-open');
+      unlockBackground();
       if (window.location.hash === '#compliance-check') history.replaceState(null, '', window.location.pathname + window.location.search);
+      opener?.focus?.();
+      opener = null;
     };
     overlay.querySelector('.agfx-assess__close').addEventListener('click', close);
     overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !overlay.hidden) close(); });
+    document.addEventListener('keydown', event => {
+      if (overlay.hidden) return;
+      if (event.key === 'Escape') {
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...overlay.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter(element => !element.closest('[hidden]') && element.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
     overlay.querySelector('.agfx-assess__start').addEventListener('click', () => { show('quiz'); renderQuestion(); });
 
     const bindTriggers = () => {
       for (const anchor of document.querySelectorAll('a[href*="#compliance-check"]')) {
         anchor.addEventListener('click', event => {
           const url = new URL(anchor.href, window.location.href);
-          if (url.pathname === window.location.pathname) { event.preventDefault(); open(); }
+          if (url.pathname === window.location.pathname) { event.preventDefault(); open(anchor); }
         });
       }
     };
@@ -785,6 +836,11 @@
     const whoWeAre = document.querySelector('.elementor-element-03f299e');
     const paragraphs = [...(whoWeAre || root).querySelectorAll('p')]
       .filter(p => p.textContent.trim());
+    const first = paragraphs[0];
+    if (first && /developed from,\s*real-world/i.test(first.textContent)) {
+      first.innerHTML = first.innerHTML.replace(/developed from,\s*real-world/i, 'developed from real-world');
+      first.dataset.agfxCopyReplaced = 'about-from-punctuation';
+    }
     const patentSentence = 'Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
     const second = paragraphs[1];
     if (second && !second.textContent.includes(patentSentence)) {
@@ -912,6 +968,12 @@
     });
     sourceStrip.classList.add('agfx-contact-source-hidden');
     sourceStrip.after(panel);
+
+    // Client 2026-08-06: lead with the light contact form, then let the map
+    // bridge into the black consultation band at the bottom of the page.
+    const hero = document.querySelector('.elementor-element-898bff1');
+    const mapSection = document.querySelector('.elementor-element-aff048a');
+    if (hero && mapSection) mapSection.after(hero);
 
     const form = panel.querySelector('.agfx-contact-form');
     const status = panel.querySelector('.agfx-contact-form__status');

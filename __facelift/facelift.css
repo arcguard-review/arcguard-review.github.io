@@ -136,6 +136,43 @@ body.agfx-facelift.agfx-page-about :where(.elementor-element-762c5d8, .elementor
   margin-inline: auto !important;
 }
 
+/* The Story CTA must not depend on Elementor's origin-specific generated CSS.
+   Keep the client-approved red gradient on every review host and viewport. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b .elementor-button {
+  background-color: #c00000 !important;
+  background-image: linear-gradient(rgb(227, 8, 8) 0%, rgb(192, 0, 0) 55%, rgb(122, 2, 2) 100%) !important;
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   FINAL RESPONSIVE REGRESSION GUARDS — 2026-08-06
+   ========================================================================== */
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-0301515 .e-15b7209-0a94cf0,
+body.agfx-facelift.agfx-page-industries .elementor-556 p.e-15b7209-0a94cf0 {
+  align-self: center !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.75) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e > .e-con-inner > .e-con {
+  border: 1px solid var(--agfx-rule) !important;
+  border-top: 4px solid var(--agfx-red) !important;
+}
+
+@media (max-width: 1024px) {
+  body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-0301515 .e-15b7209-0a94cf0,
+  body.agfx-facelift.agfx-page-industries .elementor-556 p.e-15b7209-0a94cf0 {
+    max-width: min(100%, 38rem) !important;
+    margin-inline: auto !important;
+  }
+}
+
 body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
   width: min(100%, 54ch) !important;
   margin-inline: 0 !important;
@@ -2536,17 +2573,22 @@ body.agfx-facelift .agfx-button--secondary:hover {
   color: var(--agfx-ink) !important;
 }
 
-body.agfx-facelift .agfx-button--secondary[data-assess-email] {
+/* The scorecard action sits on the same cream surface as the assessment
+   panel, so the generic light secondary treatment disappears. Give this
+   requested post-completion action the established Arc Guard CTA finish. */
+body.agfx-facelift .agfx-assess [data-assess-email] {
   border-color: #fff !important;
-  background: linear-gradient(180deg, #e30808 0%, #c00000 55%, #7a0202 100%) !important;
-  box-shadow: 0 12px 24px -14px rgba(178, 24, 28, 0.65);
+  background-color: #b50000 !important;
+  background-image: linear-gradient(rgb(0, 0, 0) 0%, rgb(204, 0, 0) 100%) !important;
   color: #fff !important;
-  font-style: italic !important;
+  box-shadow: 0 10px 24px -12px rgba(178, 24, 28, 0.9) !important;
 }
 
-body.agfx-facelift .agfx-button--secondary[data-assess-email]:hover {
+body.agfx-facelift .agfx-assess [data-assess-email]:hover,
+body.agfx-facelift .agfx-assess [data-assess-email]:focus-visible {
   border-color: #fff !important;
-  background: linear-gradient(180deg, #ef1a1a 0%, #d00000 55%, #8a0303 100%) !important;
+  background-color: #8f0000 !important;
+  background-image: linear-gradient(rgb(35, 0, 0) 0%, rgb(179, 0, 0) 100%) !important;
   color: #fff !important;
 }
 
@@ -3257,6 +3299,12 @@ body.agfx-facelift .sydney-offcanvas-menu .agfx-offcanvas-consult {
   text-align: center;
 }
 
+/* The off-canvas FAQ clone inherits the desktop CTA's 18px left offset.
+   Remove it so the button edges align with the menu items above. */
+body.agfx-facelift .sydney-offcanvas-menu #primary-menu > li.agfx-nav-faq-btn {
+  margin-left: 0 !important;
+}
+
 /* Sub-pixel seams between adjacent top-level sections let the page base show
    through as cream hairlines on the dark design; overlap neighbors by 2px. */
 body.agfx-facelift .elementor > :where(.e-con, .elementor-section) + :where(.e-con, .elementor-section) {
@@ -3528,6 +3576,15 @@ body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e {
   padding-bottom: clamp(2.5rem, 4.5vw, 4rem) !important;
 }
 
+/* Elementor leaves an implicit empty second grid row after the three cards,
+   producing hundreds of pixels of cream with no content before Oil & Gas. */
+body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e > .e-con-inner {
+  grid-template-rows: minmax(0, auto) !important;
+  grid-auto-rows: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
 body.agfx-facelift.agfx-page-industries :where(
   .elementor-element-d4e4f07,
   .elementor-element-748a353,
@@ -3755,6 +3812,7 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b {
   padding-top: clamp(1.575rem, 2.925vw, 2.475rem) !important;
   padding-bottom: clamp(1.575rem, 2.925vw, 2.475rem) !important;
+  margin-top: 0 !important;
 }
 
 /* 2026-08-01 visual hardening: Elementor's generated container variables can
@@ -3840,16 +3898,11 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 
   background-image: linear-gradient(var(--agfx-ink), var(--agfx-ink)) !important;
 }
 
+/* The section itself owns the dark paint. A redundant full-cover pseudo-layer
+   produced a 56px black corner beyond the Mission seam in mobile Safari. */
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
-  background: var(--agfx-ink) !important;
-  pointer-events: none;
+  content: none !important;
+  display: none !important;
 }
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 > * {
@@ -4465,4 +4518,11 @@ body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
 
 body.agfx-facelift.agfx-page-about :where(.elementor-element-762c5d8, .elementor-element-adce7d2) h3::after {
   margin-inline: auto !important;
+}
+
+/* Host-independent final guard for the client-approved Story CTA. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b .elementor-button {
+  background-color: #c00000 !important;
+  background-image: linear-gradient(rgb(227, 8, 8) 0%, rgb(192, 0, 0) 55%, rgb(122, 2, 2) 100%) !important;
+  color: #fff !important;
 }
