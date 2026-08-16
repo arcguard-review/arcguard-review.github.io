@@ -349,7 +349,10 @@
   // Marco's individual work address is not present in the approved project
   // materials. Until the client supplies it, route the contact form to Arc
   // Guard's verified general inbox plus Justin's verified work address.
-  const CONTACT_EMAILS = ['info@arcguardinc.com', 'J.Crumholt@ArcGuardInc.com'];
+  // Client instruction 2026-08-16: the first word of every email address is
+  // capitalised (Info@ArcGuardInc.com). Mail local-parts are treated
+  // case-insensitively by every major provider, so delivery is unaffected.
+  const CONTACT_EMAILS = ['Info@ArcGuardInc.com', 'J.Crumholt@ArcGuardInc.com'];
 
   const trackEvent = (eventName, params) => {
     try {
@@ -1028,7 +1031,7 @@
           trackEvent('generate_lead', { method: 'contact_form_email' });
         }
       } catch {
-        status.textContent = 'Please email info@arcguardinc.com.';
+        status.textContent = 'Please email Info@ArcGuardInc.com.';
         status.hidden = false;
       } finally {
         submit.disabled = false;
