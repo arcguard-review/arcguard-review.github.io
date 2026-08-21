@@ -4538,3 +4538,60 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b 
 body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 .elementor-element-fe2a038 {
   margin: 0 !important;
 }
+
+/* HOME CTA BAND — kill the staircase in the left column. Native Elementor
+   margins left the three elements on three different left edges at >=1280:
+   heading 110 (margin-left 20px), paragraph 93 (margin 3px), button 75
+   (margin-left -15px) against a column starting at 80 — so the button hung 5px
+   OUTSIDE its own column. The right column was already flush at 750/750/750.
+   Also zero the stray 8.84px top margin that left the two buttons 5px out of
+   vertical alignment. Same stray-native-margin family as the red-rule step. */
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .elementor-widget {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .elementor-widget-button {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 767px) {
+  /* COMPLIANCE CAROUSEL — take the arrows off the cards. They were
+     position:absolute over the track with a 55%-black scrim, covering ~69px of
+     each adjacent card's code and title. Since the 2026-08-21 reorder this is
+     the second thing a phone visitor sees, so the overlap is far more exposed.
+     Lay the track full width, then the arrows centred beneath it. 44px also
+     brings them up to an accessible tap target. */
+  body.agfx-facelift .agfx-compliance__rail {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+  }
+
+  body.agfx-facelift .agfx-compliance__track {
+    order: 1 !important;
+    flex: 1 0 100% !important;
+    width: 100% !important;
+  }
+
+  body.agfx-facelift .agfx-compliance__arrow {
+    order: 2 !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+/* The staircase above lives on the Elementor ATOMIC elements, not the widget
+   wrappers: h3.e-heading-base carries margin-left:20px and p.e-paragraph-base
+   carries margin-left:3px, so zeroing .elementor-widget margins alone left the
+   column edges at 110/93/90. Flatten the atomics too. */
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 :is(.e-heading-base, .e-paragraph-base) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}

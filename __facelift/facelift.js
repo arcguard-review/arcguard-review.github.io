@@ -1054,9 +1054,15 @@
 
   const addRevealMotion = () => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // The injected compliance section is a bare <section class="agfx-compliance
+    // agfx-reveal">, not an ".elementor > .e-con", so it was never collected and
+    // never observed — leaving it stuck at the pre-reveal translateY(8px) forever
+    // on desktop pointers. It paints 8px low and is the only section that never
+    // reveals. Since the 2026-08-21 reorder it is the SECOND section on the page,
+    // so include it explicitly.
     const candidates = [
       ...document.querySelectorAll(
-        '.elementor > .e-con, .elementor > .elementor-section, #main.post-wrap > article'
+        '.elementor > .e-con, .elementor > .elementor-section, #main.post-wrap > article, .agfx-compliance'
       )
     ].filter(Boolean);
     candidates.forEach(element => element.classList.add('agfx-reveal'));
