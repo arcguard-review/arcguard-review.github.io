@@ -747,12 +747,13 @@
     );
     const problemSection = problemHeading?.closest('.elementor > .e-con, .elementor > .elementor-section');
     if (problemSection) {
-      const cardsSection = problemSection.nextElementSibling;
-      const anchor =
-        cardsSection && /Dropped Object|Costly Shutdowns|Unintentional Arcs/i.test(cardsSection.textContent)
-          ? cardsSection
-          : problemSection;
-      anchor.after(section);
+      // Client 2026-08-18 (via Corban): the "So You Think You're Compliant?"
+      // section swaps places with the segment above it — the whole "THE PROBLEM"
+      // block, meaning its heading band AND the four hazard cards beneath it.
+      // Insert before the heading: dropping it between the heading and its cards
+      // would strand "THE PROBLEM — ARC FLASH & DROPPED OBJECTS" above unrelated
+      // content, which is not a swap, it is a broken section.
+      problemSection.before(section);
     } else {
       (document.querySelector('.elementor-14043, main, #content') || document.body).append(section);
     }

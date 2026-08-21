@@ -4526,3 +4526,15 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b 
   background-image: linear-gradient(rgb(227, 8, 8) 0%, rgb(192, 0, 0) 55%, rgb(122, 2, 2) 100%) !important;
   color: #fff !important;
 }
+
+/* HOME — "THE PROBLEM" red rule: close the 1px step at the column boundary.
+   The right-hand card of the first row (fe2a038) carries a native Elementor
+   `margin: -1px` on all four sides. The negative TOP margin lifted it a pixel
+   above its sibling, so its half of the shared 2px red border-top drew one row
+   higher — reading as a break in the middle of the line, exactly as the client
+   reported. Its siblings all use margin 0 and sit flush with no horizontal
+   seam, so matching them is the fix; nothing depended on the negative inline
+   margins. Measured in real Chrome: tops 114.578 vs 115.578 before, equal after. */
+body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 .elementor-element-fe2a038 {
+  margin: 0 !important;
+}
