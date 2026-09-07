@@ -341,18 +341,18 @@
   // "add back the compliance assessment"). Concept approved on the recorded
   // 7/16 Zoom (Marco: "So you think you're compliant? See how you stack up";
   // Corban: "a button that says compliance assessment ... it pops up asking
-  // for their email"). Leads: localStorage + prefilled email CC'ing
-  // J.Crumholt@ArcGuardInc.com, plus a Google Analytics `generate_lead` event
-  // through the site's Site Kit tag (GT-WPL27JSD) so conversion rate is
-  // trackable in GA4. No PII is sent to GA.
+  // for their email"). Leads: configurable Google Sheets webhook + localStorage
+  // fallback + prefilled email CC'ing J.Crumholt@ArcGuardInc.com, plus a Google
+  // Analytics `generate_lead` event through the site's Site Kit tag
+  // (GT-WPL27JSD) so conversion rate is trackable in GA4. No PII is sent to GA.
   const CALENDLY_URL = 'https://calendly.com/m-moran-arcguardinc/30min';
   // Marco's individual work address is not present in the approved project
   // materials. Until the client supplies it, route the contact form to Arc
   // Guard's verified general inbox plus Justin's verified work address.
-  // Client instruction 2026-08-16: the first word of every email address is
-  // capitalised (Info@ArcGuardInc.com). Mail local-parts are treated
-  // case-insensitively by every major provider, so delivery is unaffected.
-  const CONTACT_EMAILS = ['Info@ArcGuardInc.com', 'J.Crumholt@ArcGuardInc.com'];
+  const CONTACT_EMAILS = ['info@arcguardinc.com', 'J.Crumholt@ArcGuardInc.com'];
+  const CRM_CONFIG = window.arcguardFaceliftCrm || {};
+  const CRM_WEBHOOK_URL = CRM_CONFIG.webhookUrl || '';
+  const CRM_WEBHOOK_MODE = CRM_CONFIG.webhookMode || 'no-cors';
 
   const trackEvent = (eventName, params) => {
     try {
@@ -362,6 +362,59 @@
         window.dataLayer.push({ event: eventName, ...params });
       }
     } catch {}
+  };
+
+  const textFieldValue = (form, name) => (form.elements[name]?.value || '').trim();
+
+  const trafficContext = () => {
+    const params = new URLSearchParams(window.location.search);
+    const source = (params.get('utm_source') || '').toLowerCase();
+    const medium = (params.get('utm_medium') || '').toLowerCase();
+    const channel = (() => {
+      if (!source && document.referrer) return 'Referral';
+      if (!source) return 'Direct';
+      if (/google|bing|yahoo|duckduckgo/.test(source)) return /cpc|paid|ppc/.test(medium) ? 'Paid search' : 'Organic search';
+      if (/linkedin|facebook|instagram|meta|tiktok|x\.com|twitter/.test(source)) return /paid|cpc|ad/.test(medium) ? 'Paid social' : 'Organic social';
+      if (/distributor/.test(source)) return 'Distributor';
+      if (/partner/.test(source)) return 'Partner';
+      if (/trade|show|event/.test(source)) return 'Trade show';
+      if (/email|newsletter/.test(source)) return 'Email';
+      if (/manual/.test(source)) return 'Manual entry';
+      return 'Unknown';
+    })();
+    return {
+      source_channel: channel,
+      utm_source: params.get('utm_source') || '',
+      utm_medium: params.get('utm_medium') || '',
+      utm_campaign: params.get('utm_campaign') || '',
+      landing_page: window.location.pathname || '/',
+      referrer: document.referrer || ''
+    };
+  };
+
+  const submitAssessmentToCrm = async payload => {
+    window.__AGFX_CRM = {
+      configured: Boolean(CRM_WEBHOOK_URL),
+      lastPayload: payload,
+      lastStatus: CRM_WEBHOOK_URL ? 'pending' : 'not_configured'
+    };
+    if (!CRM_WEBHOOK_URL) return { status: 'not_configured' };
+
+    try {
+      await fetch(CRM_WEBHOOK_URL, {
+        method: 'POST',
+        mode: CRM_WEBHOOK_MODE,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      });
+      window.__AGFX_CRM.lastStatus = 'sent';
+      return { status: 'sent' };
+    } catch (error) {
+      window.__AGFX_CRM.lastStatus = 'failed';
+      window.__AGFX_CRM.lastError = String(error?.message || error);
+      return { status: 'failed' };
+    }
   };
 
   const ASSESSMENT = {
@@ -416,6 +469,36 @@
             <input type="text" name="name" placeholder="Name" autocomplete="name" required>
             <input type="text" name="company" placeholder="Company" autocomplete="organization" required>
             <input type="email" name="email" placeholder="Work email" autocomplete="email" required>
+            <input type="tel" name="phone" placeholder="Phone" autocomplete="tel">
+            <select name="lead_type">
+              <option value="">I am evaluating Arc Guard as...</option>
+              <option>Contractor</option>
+              <option>Plant Safety Manager</option>
+              <option>Distributor / Partner</option>
+              <option>Safety Consultant</option>
+              <option>Site Contact</option>
+              <option>Other</option>
+            </select>
+            <select name="primary_compliance_concern">
+              <option value="">Primary compliance concern</option>
+              <option>Arc flash prevention</option>
+              <option>Dropped object prevention</option>
+              <option>Welding lead connector safety</option>
+              <option>Hot work compliance</option>
+              <option>Site safety standardization</option>
+              <option>Product demo request</option>
+              <option>Distributor opportunity</option>
+              <option>Other</option>
+            </select>
+            <select name="product_interest">
+              <option value="">What would you like next?</option>
+              <option>Walkthrough</option>
+              <option>Pilot</option>
+              <option>Product information</option>
+              <option>Distributor contact</option>
+              <option>Compliance Standards</option>
+            </select>
+            <textarea name="message" rows="3" placeholder="Additional notes for Arc Guard"></textarea>
             <button class="agfx-button" type="submit">Show My Scorecard</button>
             <p class="agfx-assess__error" hidden>Please enter your name, company, and a valid work email.</p>
           </form>
@@ -455,30 +538,45 @@
     const answers = [];
     let current = 0;
     const lead = {};
-    let opener = null;
-    let backgroundState = [];
 
-    const lockBackground = () => {
-      backgroundState = [...document.body.children]
-        .filter(element => element !== overlay)
-        .map(element => ({
-          element,
-          inert: element.inert,
-          ariaHidden: element.getAttribute('aria-hidden')
-        }));
-      backgroundState.forEach(({ element }) => {
-        element.inert = true;
-        element.setAttribute('aria-hidden', 'true');
-      });
-    };
+    const answerLines = () =>
+      ASSESSMENT.questions.map((q, i) => `${q.cat} — ${q.text} -> ${q.options[answers[i]] || ''}`);
 
-    const unlockBackground = () => {
-      backgroundState.forEach(({ element, inert, ariaHidden }) => {
-        element.inert = inert;
-        if (ariaHidden === null) element.removeAttribute('aria-hidden');
-        else element.setAttribute('aria-hidden', ariaHidden);
-      });
-      backgroundState = [];
+    const buildLeadPayload = () => {
+      const context = trafficContext();
+      const total = score();
+      const max = ASSESSMENT.questions.length * 2;
+      const tier = ASSESSMENT.tiers.find(t => total >= t.min);
+      const now = new Date().toISOString();
+
+      return {
+        lead_id: `AG-${Date.now().toString(36).toUpperCase()}`,
+        date_received: now,
+        lead_name: lead.name || '',
+        company: lead.company || '',
+        email: lead.email || '',
+        phone: lead.phone || '',
+        industry: 'Industrial / Welding Safety',
+        lead_type: lead.lead_type || 'General compliance assessment lead',
+        primary_compliance_concern: lead.primary_compliance_concern || '',
+        product_interest: lead.product_interest || '',
+        source_channel: context.source_channel,
+        source_detail: [context.utm_source, context.utm_medium].filter(Boolean).join(' / ') || context.referrer || '',
+        utm_campaign: context.utm_campaign || '',
+        landing_page: context.landing_page,
+        referrer: context.referrer,
+        assessment_submitted: 'Yes',
+        assessment_score: `${total}/${max}`,
+        assessment_tier: tier?.label || '',
+        owner: '',
+        stage: 'New assessment',
+        next_action: 'Review lead and determine distributor readiness',
+        distributor_handoff_status: 'New',
+        partner_distributor: '',
+        last_updated: now,
+        notes: lead.message || '',
+        assessment_answers: answerLines().join('\n')
+      };
     };
 
     const renderQuestion = () => {
@@ -542,81 +640,61 @@
       }
       const connectorGap = (answers[2] ?? 2) > 0 || (answers[6] ?? 2) > 0;
       stages.results.querySelector('.agfx-assess__gap').hidden = !connectorGap;
-      const lines = ASSESSMENT.questions.map((q, i) => `${q.cat} — ${q.text} → ${q.options[answers[i]]}`);
-      const body = `Welding Hot-Work Compliance Self-Check scorecard%0D%0A%0D%0A${encodeURIComponent(lead.name || '')} · ${encodeURIComponent(lead.company || '')} · ${encodeURIComponent(lead.email || '')}%0D%0AScore: ${total}/${max} — ${tier.label}%0D%0A%0D%0A${lines.map(l => encodeURIComponent(l)).join('%0D%0A')}`;
+      const body = `Welding Hot-Work Compliance Self-Check scorecard%0D%0A%0D%0A${encodeURIComponent(lead.name || '')} · ${encodeURIComponent(lead.company || '')} · ${encodeURIComponent(lead.email || '')}%0D%0AScore: ${total}/${max} — ${tier.label}%0D%0A%0D%0A${answerLines().map(l => encodeURIComponent(l)).join('%0D%0A')}`;
       stages.results.querySelector('[data-assess-email]').href =
         `mailto:${encodeURIComponent(lead.email || '')}?cc=J.Crumholt@ArcGuardInc.com&subject=${encodeURIComponent('Your Arc Guard compliance self-check scorecard')}&body=${body}`;
       show('results');
     };
 
-    stages.gate.querySelector('.agfx-assess__form').addEventListener('submit', event => {
+    stages.gate.querySelector('.agfx-assess__form').addEventListener('submit', async event => {
       event.preventDefault();
       const form = event.currentTarget;
-      lead.name = form.name.value.trim();
-      lead.company = form.company.value.trim();
-      lead.email = form.email.value.trim();
+      lead.name = textFieldValue(form, 'name');
+      lead.company = textFieldValue(form, 'company');
+      lead.email = textFieldValue(form, 'email');
+      lead.phone = textFieldValue(form, 'phone');
+      lead.lead_type = textFieldValue(form, 'lead_type');
+      lead.primary_compliance_concern = textFieldValue(form, 'primary_compliance_concern');
+      lead.product_interest = textFieldValue(form, 'product_interest');
+      lead.message = textFieldValue(form, 'message');
       const valid = lead.name && lead.company && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email);
       form.querySelector('.agfx-assess__error').hidden = valid;
       if (!valid) return;
+      const payload = buildLeadPayload();
       try {
         const stash = JSON.parse(localStorage.getItem('agfx-assessment-leads') || '[]');
-        stash.push({ ...lead, answers: [...answers], score: score(), at: new Date().toISOString() });
+        stash.push({ ...payload, answers: [...answers] });
         localStorage.setItem('agfx-assessment-leads', JSON.stringify(stash));
       } catch {}
+      submitAssessmentToCrm(payload);
       // GA4 key event for conversion-rate tracking (no PII sent).
       trackEvent('generate_lead', { method: 'compliance_assessment', assessment_score: score() });
       renderResults();
     });
 
-    const open = trigger => {
-      opener = trigger || document.activeElement;
+    const open = () => {
       overlay.hidden = false;
       document.body.classList.add('agfx-assess-open');
-      lockBackground();
       answers.length = 0;
       current = 0;
       show('intro');
-      requestAnimationFrame(() => overlay.querySelector('.agfx-assess__start')?.focus());
       trackEvent('assessment_open', { method: 'compliance_assessment' });
     };
     const close = () => {
       overlay.hidden = true;
       document.body.classList.remove('agfx-assess-open');
-      unlockBackground();
       if (window.location.hash === '#compliance-check') history.replaceState(null, '', window.location.pathname + window.location.search);
-      opener?.focus?.();
-      opener = null;
     };
     overlay.querySelector('.agfx-assess__close').addEventListener('click', close);
     overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
-    document.addEventListener('keydown', event => {
-      if (overlay.hidden) return;
-      if (event.key === 'Escape') {
-        close();
-        return;
-      }
-      if (event.key !== 'Tab') return;
-      const focusable = [...overlay.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )].filter(element => !element.closest('[hidden]') && element.getClientRects().length);
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !overlay.hidden) close(); });
     overlay.querySelector('.agfx-assess__start').addEventListener('click', () => { show('quiz'); renderQuestion(); });
 
     const bindTriggers = () => {
       for (const anchor of document.querySelectorAll('a[href*="#compliance-check"]')) {
         anchor.addEventListener('click', event => {
           const url = new URL(anchor.href, window.location.href);
-          if (url.pathname === window.location.pathname) { event.preventDefault(); open(anchor); }
+          if (url.pathname === window.location.pathname) { event.preventDefault(); open(); }
         });
       }
     };
@@ -747,12 +825,6 @@
     );
     const problemSection = problemHeading?.closest('.elementor > .e-con, .elementor > .elementor-section');
     if (problemSection) {
-      // Client 2026-08-18 (via Corban): the "So You Think You're Compliant?"
-      // section swaps places with the segment above it — the whole "THE PROBLEM"
-      // block, meaning its heading band AND the four hazard cards beneath it.
-      // Insert before the heading: dropping it between the heading and its cards
-      // would strand "THE PROBLEM — ARC FLASH & DROPPED OBJECTS" above unrelated
-      // content, which is not a swap, it is a broken section.
       problemSection.before(section);
     } else {
       (document.querySelector('.elementor-14043, main, #content') || document.body).append(section);
@@ -840,11 +912,6 @@
     const whoWeAre = document.querySelector('.elementor-element-03f299e');
     const paragraphs = [...(whoWeAre || root).querySelectorAll('p')]
       .filter(p => p.textContent.trim());
-    const first = paragraphs[0];
-    if (first && /developed from,\s*real-world/i.test(first.textContent)) {
-      first.innerHTML = first.innerHTML.replace(/developed from,\s*real-world/i, 'developed from real-world');
-      first.dataset.agfxCopyReplaced = 'about-from-punctuation';
-    }
     const patentSentence = 'Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
     const second = paragraphs[1];
     if (second && !second.textContent.includes(patentSentence)) {
@@ -973,12 +1040,6 @@
     sourceStrip.classList.add('agfx-contact-source-hidden');
     sourceStrip.after(panel);
 
-    // Client 2026-08-06: lead with the light contact form, then let the map
-    // bridge into the black consultation band at the bottom of the page.
-    const hero = document.querySelector('.elementor-element-898bff1');
-    const mapSection = document.querySelector('.elementor-element-aff048a');
-    if (hero && mapSection) mapSection.after(hero);
-
     const form = panel.querySelector('.agfx-contact-form');
     const status = panel.querySelector('.agfx-contact-form__status');
     window.__AGFX_CONTACT = {
@@ -1032,7 +1093,7 @@
           trackEvent('generate_lead', { method: 'contact_form_email' });
         }
       } catch {
-        status.textContent = 'Please email Info@ArcGuardInc.com.';
+        status.textContent = 'Please email info@arcguardinc.com.';
         status.hidden = false;
       } finally {
         submit.disabled = false;
@@ -1054,15 +1115,9 @@
 
   const addRevealMotion = () => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // The injected compliance section is a bare <section class="agfx-compliance
-    // agfx-reveal">, not an ".elementor > .e-con", so it was never collected and
-    // never observed — leaving it stuck at the pre-reveal translateY(8px) forever
-    // on desktop pointers. It paints 8px low and is the only section that never
-    // reveals. Since the 2026-08-21 reorder it is the SECOND section on the page,
-    // so include it explicitly.
     const candidates = [
       ...document.querySelectorAll(
-        '.elementor > .e-con, .elementor > .elementor-section, #main.post-wrap > article, .agfx-compliance'
+        '.elementor > .e-con, .elementor > .elementor-section, #main.post-wrap > article'
       )
     ].filter(Boolean);
     candidates.forEach(element => element.classList.add('agfx-reveal'));
