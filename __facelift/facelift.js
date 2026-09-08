@@ -341,17 +341,45 @@
   // "add back the compliance assessment"). Concept approved on the recorded
   // 7/16 Zoom (Marco: "So you think you're compliant? See how you stack up";
   // Corban: "a button that says compliance assessment ... it pops up asking
-  // for their email"). Leads: configurable Google Sheets webhook + localStorage
-  // fallback + prefilled email CC'ing J.Crumholt@ArcGuardInc.com, plus a Google
-  // Analytics `generate_lead` event through the site's Site Kit tag
-  // (GT-WPL27JSD) so conversion rate is trackable in GA4. No PII is sent to GA.
+  // for their email"). Leads: the Google Sheets CRM webhook below, plus
+  // localStorage and a prefilled email CC'ing J.Crumholt@ArcGuardInc.com as
+  // fallbacks, plus a Google Analytics `generate_lead` event through the
+  // site's Site Kit tag (GT-WPL27JSD) so conversion rate is trackable in GA4.
+  // No PII is sent to GA.
   const CALENDLY_URL = 'https://calendly.com/m-moran-arcguardinc/30min';
   // Marco's individual work address is not present in the approved project
   // materials. Until the client supplies it, route the contact form to Arc
   // Guard's verified general inbox plus Justin's verified work address.
-  const CONTACT_EMAILS = ['info@arcguardinc.com', 'J.Crumholt@ArcGuardInc.com'];
+  // Client instruction 2026-08-16: the first word of every email address is
+  // capitalised (Info@ArcGuardInc.com). Mail local-parts are treated
+  // case-insensitively by every major provider, so delivery is unaffected.
+  const CONTACT_EMAILS = ['Info@ArcGuardInc.com', 'J.Crumholt@ArcGuardInc.com'];
+
+  // ---- CRM intake. Client instruction 2026-09-07 (Corban, CPR Insights):
+  // "wire the live Arc Guard compliance assessment form to this webhook URL".
+  // The endpoint is a Google Apps Script web app that appends one row per lead
+  // to the "Raw Submissions" tab of Arc Guard's CRM sheet. `GET /exec` answers
+  // {"ok":true,"service":"Arc Guard CRM intake"} — use it as a health probe.
+  //
+  // The URL is necessarily public: it is called from the visitor's browser, so
+  // it is readable in page source by anyone. That is inherent to a static
+  // front-end posting to Apps Script and is how the client built it; the
+  // endpoint is append-only and holds no secret. Redeploying the script mints a
+  // NEW /exec URL, so keep `window.arcguardFaceliftCrm.webhookUrl` as the
+  // override hook — the WordPress plugin can swap the deployment without a
+  // facelift release. Port of Corban's review-repo commit 2af557a.
+  //
+  // Mode is `no-cors` on purpose. /exec does answer `access-control-allow-origin: *`,
+  // but it 302s to script.googleusercontent.com, and a CORS failure on the
+  // redirect target would surface as a thrown fetch AFTER the row was already
+  // written — i.e. a retry would double-submit. Fire-and-forget always delivers
+  // and never duplicates; delivery is confirmed out of band in the sheet.
+  const CRM_DEFAULT_WEBHOOK =
+    'https://script.google.com/macros/s/AKfycbzKvWuc66XAFhEzQoXwhMEEop81hw4lzMV5m9eoR32uJYDEOzbdKc-b9TymTQCzRxbUMA/exec';
   const CRM_CONFIG = window.arcguardFaceliftCrm || {};
-  const CRM_WEBHOOK_URL = CRM_CONFIG.webhookUrl || '';
+  const CRM_WEBHOOK_URL = 'webhookUrl' in CRM_CONFIG
+    ? (CRM_CONFIG.webhookUrl || '')
+    : CRM_DEFAULT_WEBHOOK;
   const CRM_WEBHOOK_MODE = CRM_CONFIG.webhookMode || 'no-cors';
 
   const trackEvent = (eventName, params) => {
@@ -364,8 +392,12 @@
     } catch {}
   };
 
+  // Corban's commit 2af557a. `form.elements[name]` rather than `form[name]`:
+  // the gate form now has a field literally named `name`, and `form.name` is
+  // the form element's own name property, not the input.
   const textFieldValue = (form, name) => (form.elements[name]?.value || '').trim();
 
+  // Corban's commit 2af557a — attribution columns for the CRM sheet.
   const trafficContext = () => {
     const params = new URLSearchParams(window.location.search);
     const source = (params.get('utm_source') || '').toLowerCase();
@@ -392,9 +424,13 @@
     };
   };
 
-  const submitAssessmentToCrm = async payload => {
+  // Corban's commit 2af557a, extended to carry the contact form too.
+  // `window.__AGFX_CRM` is the probe surface the verification battery reads;
+  // it must never contain anything the page does not already hold.
+  const submitLeadToCrm = async payload => {
     window.__AGFX_CRM = {
       configured: Boolean(CRM_WEBHOOK_URL),
+      mode: CRM_WEBHOOK_MODE,
       lastPayload: payload,
       lastStatus: CRM_WEBHOOK_URL ? 'pending' : 'not_configured'
     };
@@ -404,6 +440,8 @@
       await fetch(CRM_WEBHOOK_URL, {
         method: 'POST',
         mode: CRM_WEBHOOK_MODE,
+        // text/plain keeps this a CORS-simple request, so the browser sends it
+        // without a preflight — Apps Script does not answer OPTIONS.
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload),
         keepalive: true
@@ -538,10 +576,40 @@
     const answers = [];
     let current = 0;
     const lead = {};
+    let opener = null;
+    let backgroundState = [];
 
+    const lockBackground = () => {
+      backgroundState = [...document.body.children]
+        .filter(element => element !== overlay)
+        .map(element => ({
+          element,
+          inert: element.inert,
+          ariaHidden: element.getAttribute('aria-hidden')
+        }));
+      backgroundState.forEach(({ element }) => {
+        element.inert = true;
+        element.setAttribute('aria-hidden', 'true');
+      });
+    };
+
+    const unlockBackground = () => {
+      backgroundState.forEach(({ element, inert, ariaHidden }) => {
+        element.inert = inert;
+        if (ariaHidden === null) element.removeAttribute('aria-hidden');
+        else element.setAttribute('aria-hidden', ariaHidden);
+      });
+      backgroundState = [];
+    };
+
+    // Shared by the scorecard mailto and the CRM payload so the two can never
+    // describe the same submission differently. The `|| ''` guard matters: a
+    // lead can submit the gate before answering every question.
     const answerLines = () =>
-      ASSESSMENT.questions.map((q, i) => `${q.cat} — ${q.text} -> ${q.options[answers[i]] || ''}`);
+      ASSESSMENT.questions.map((q, i) => `${q.cat} — ${q.text} → ${q.options[answers[i]] || ''}`);
 
+    // Corban's commit 2af557a. Keys are the CRM sheet's column contract —
+    // renaming one silently drops that column in Raw Submissions.
     const buildLeadPayload = () => {
       const context = trafficContext();
       const total = score();
@@ -646,7 +714,7 @@
       show('results');
     };
 
-    stages.gate.querySelector('.agfx-assess__form').addEventListener('submit', async event => {
+    stages.gate.querySelector('.agfx-assess__form').addEventListener('submit', event => {
       event.preventDefault();
       const form = event.currentTarget;
       lead.name = textFieldValue(form, 'name');
@@ -666,35 +734,63 @@
         stash.push({ ...payload, answers: [...answers] });
         localStorage.setItem('agfx-assessment-leads', JSON.stringify(stash));
       } catch {}
-      submitAssessmentToCrm(payload);
+      // Fire-and-forget: the scorecard must render even if the network is
+      // down, and the localStorage stash above is the local record either way.
+      submitLeadToCrm(payload);
       // GA4 key event for conversion-rate tracking (no PII sent).
       trackEvent('generate_lead', { method: 'compliance_assessment', assessment_score: score() });
       renderResults();
     });
 
-    const open = () => {
+    const open = trigger => {
+      opener = trigger || document.activeElement;
       overlay.hidden = false;
       document.body.classList.add('agfx-assess-open');
+      lockBackground();
       answers.length = 0;
       current = 0;
       show('intro');
+      requestAnimationFrame(() => overlay.querySelector('.agfx-assess__start')?.focus());
       trackEvent('assessment_open', { method: 'compliance_assessment' });
     };
     const close = () => {
       overlay.hidden = true;
       document.body.classList.remove('agfx-assess-open');
+      unlockBackground();
       if (window.location.hash === '#compliance-check') history.replaceState(null, '', window.location.pathname + window.location.search);
+      opener?.focus?.();
+      opener = null;
     };
     overlay.querySelector('.agfx-assess__close').addEventListener('click', close);
     overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !overlay.hidden) close(); });
+    document.addEventListener('keydown', event => {
+      if (overlay.hidden) return;
+      if (event.key === 'Escape') {
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...overlay.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter(element => !element.closest('[hidden]') && element.getClientRects().length);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
     overlay.querySelector('.agfx-assess__start').addEventListener('click', () => { show('quiz'); renderQuestion(); });
 
     const bindTriggers = () => {
       for (const anchor of document.querySelectorAll('a[href*="#compliance-check"]')) {
         anchor.addEventListener('click', event => {
           const url = new URL(anchor.href, window.location.href);
-          if (url.pathname === window.location.pathname) { event.preventDefault(); open(); }
+          if (url.pathname === window.location.pathname) { event.preventDefault(); open(anchor); }
         });
       }
     };
@@ -825,6 +921,12 @@
     );
     const problemSection = problemHeading?.closest('.elementor > .e-con, .elementor > .elementor-section');
     if (problemSection) {
+      // Client 2026-08-18 (via Corban): the "So You Think You're Compliant?"
+      // section swaps places with the segment above it — the whole "THE PROBLEM"
+      // block, meaning its heading band AND the four hazard cards beneath it.
+      // Insert before the heading: dropping it between the heading and its cards
+      // would strand "THE PROBLEM — ARC FLASH & DROPPED OBJECTS" above unrelated
+      // content, which is not a swap, it is a broken section.
       problemSection.before(section);
     } else {
       (document.querySelector('.elementor-14043, main, #content') || document.body).append(section);
@@ -912,6 +1014,11 @@
     const whoWeAre = document.querySelector('.elementor-element-03f299e');
     const paragraphs = [...(whoWeAre || root).querySelectorAll('p')]
       .filter(p => p.textContent.trim());
+    const first = paragraphs[0];
+    if (first && /developed from,\s*real-world/i.test(first.textContent)) {
+      first.innerHTML = first.innerHTML.replace(/developed from,\s*real-world/i, 'developed from real-world');
+      first.dataset.agfxCopyReplaced = 'about-from-punctuation';
+    }
     const patentSentence = 'Arc Guard™ is fully protected by U.S. Patent No. 12,671,212 B1.';
     const second = paragraphs[1];
     if (second && !second.textContent.includes(patentSentence)) {
@@ -1040,13 +1147,66 @@
     sourceStrip.classList.add('agfx-contact-source-hidden');
     sourceStrip.after(panel);
 
+    // Client 2026-08-06: lead with the light contact form, then let the map
+    // bridge into the black consultation band at the bottom of the page.
+    const hero = document.querySelector('.elementor-element-898bff1');
+    const mapSection = document.querySelector('.elementor-element-aff048a');
+    if (hero && mapSection) mapSection.after(hero);
+
     const form = panel.querySelector('.agfx-contact-form');
     const status = panel.querySelector('.agfx-contact-form__status');
     window.__AGFX_CONTACT = {
       recipients: [...CONTACT_EMAILS],
       mode: window.arcguardFaceliftContact?.ajaxUrl && window.arcguardFaceliftContact?.nonce
         ? 'server'
-        : 'addressed-email'
+        : CRM_WEBHOOK_URL
+          ? 'crm-webhook'
+          : 'addressed-email'
+    };
+
+    // The contact form reuses the assessment's CRM columns so both lead
+    // sources land in one Raw Submissions tab. Position has no column of its
+    // own — Role/Title is one of the fields the client had removed and asked
+    // to keep removed (2026-09-07) — so it rides along in notes.
+    const buildContactPayload = data => {
+      const context = trafficContext();
+      const now = new Date().toISOString();
+      const position = (data.get('position') || '').trim();
+      const comments = (data.get('comments') || '').trim();
+      const website = (data.get('website') || '').trim();
+      return {
+        lead_id: `AG-C-${Date.now().toString(36).toUpperCase()}`,
+        date_received: now,
+        lead_name: [data.get('first_name'), data.get('last_name')]
+          .map(part => (part || '').trim()).filter(Boolean).join(' '),
+        company: (data.get('company') || '').trim(),
+        email: (data.get('email') || '').trim(),
+        phone: (data.get('phone') || '').trim(),
+        industry: 'Industrial / Welding Safety',
+        lead_type: 'Contact form enquiry',
+        primary_compliance_concern: '',
+        product_interest: '',
+        source_channel: context.source_channel,
+        source_detail: [context.utm_source, context.utm_medium].filter(Boolean).join(' / ') || context.referrer || '',
+        utm_campaign: context.utm_campaign || '',
+        landing_page: context.landing_page,
+        referrer: context.referrer,
+        assessment_submitted: 'No',
+        assessment_score: '',
+        assessment_tier: '',
+        owner: '',
+        stage: 'New contact enquiry',
+        next_action: 'Respond to contact form enquiry',
+        distributor_handoff_status: 'New',
+        partner_distributor: '',
+        last_updated: now,
+        notes: [
+          position && `Position: ${position}`,
+          website && `Website: ${website}`,
+          comments && `Comments: ${comments}`
+        ].filter(Boolean).join('\n'),
+        assessment_answers: ''
+      };
     };
     form.addEventListener('submit', async event => {
       event.preventDefault();
@@ -1073,6 +1233,16 @@
           status.textContent = 'Thank you. Your message has been sent.';
           status.hidden = false;
           trackEvent('generate_lead', { method: 'contact_form' });
+        } else if (CRM_WEBHOOK_URL && (await submitLeadToCrm(buildContactPayload(data))).status === 'sent') {
+          // Reaches the server for real, so the lead is recorded even when the
+          // visitor has no mail client. `no-cors` still rejects on a genuine
+          // network failure (only response INSPECTION is opaque), so a 'failed'
+          // status here means nothing was delivered and the mailto path below
+          // is the honest fallback rather than a silently dropped lead.
+          form.reset();
+          status.textContent = 'Thank you. Your message has been sent.';
+          status.hidden = false;
+          trackEvent('generate_lead', { method: 'contact_form_crm' });
         } else {
           const lines = [
             `First Name: ${data.get('first_name') || ''}`,
@@ -1093,7 +1263,7 @@
           trackEvent('generate_lead', { method: 'contact_form_email' });
         }
       } catch {
-        status.textContent = 'Please email info@arcguardinc.com.';
+        status.textContent = 'Please email Info@ArcGuardInc.com.';
         status.hidden = false;
       } finally {
         submit.disabled = false;
@@ -1115,9 +1285,15 @@
 
   const addRevealMotion = () => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // The injected compliance section is a bare <section class="agfx-compliance
+    // agfx-reveal">, not an ".elementor > .e-con", so it was never collected and
+    // never observed — leaving it stuck at the pre-reveal translateY(8px) forever
+    // on desktop pointers. It paints 8px low and is the only section that never
+    // reveals. Since the 2026-08-21 reorder it is the SECOND section on the page,
+    // so include it explicitly.
     const candidates = [
       ...document.querySelectorAll(
-        '.elementor > .e-con, .elementor > .elementor-section, #main.post-wrap > article'
+        '.elementor > .e-con, .elementor > .elementor-section, #main.post-wrap > article, .agfx-compliance'
       )
     ].filter(Boolean);
     candidates.forEach(element => element.classList.add('agfx-reveal'));

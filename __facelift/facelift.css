@@ -136,6 +136,43 @@ body.agfx-facelift.agfx-page-about :where(.elementor-element-762c5d8, .elementor
   margin-inline: auto !important;
 }
 
+/* The Story CTA must not depend on Elementor's origin-specific generated CSS.
+   Keep the client-approved red gradient on every review host and viewport. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b .elementor-button {
+  background-color: #c00000 !important;
+  background-image: linear-gradient(rgb(227, 8, 8) 0%, rgb(192, 0, 0) 55%, rgb(122, 2, 2) 100%) !important;
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   FINAL RESPONSIVE REGRESSION GUARDS — 2026-08-06
+   ========================================================================== */
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-0301515 .e-15b7209-0a94cf0,
+body.agfx-facelift.agfx-page-industries .elementor-556 p.e-15b7209-0a94cf0 {
+  align-self: center !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.75) !important;
+}
+
+body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-86aa59e > .e-con-inner > .e-con {
+  border: 1px solid var(--agfx-rule) !important;
+  border-top: 4px solid var(--agfx-red) !important;
+}
+
+@media (max-width: 1024px) {
+  body.agfx-facelift.agfx-page-industries .elementor-556 .elementor-element-0301515 .e-15b7209-0a94cf0,
+  body.agfx-facelift.agfx-page-industries .elementor-556 p.e-15b7209-0a94cf0 {
+    max-width: min(100%, 38rem) !important;
+    margin-inline: auto !important;
+  }
+}
+
 body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
   width: min(100%, 54ch) !important;
   margin-inline: 0 !important;
@@ -2536,17 +2573,22 @@ body.agfx-facelift .agfx-button--secondary:hover {
   color: var(--agfx-ink) !important;
 }
 
-body.agfx-facelift .agfx-button--secondary[data-assess-email] {
+/* The scorecard action sits on the same cream surface as the assessment
+   panel, so the generic light secondary treatment disappears. Give this
+   requested post-completion action the established Arc Guard CTA finish. */
+body.agfx-facelift .agfx-assess [data-assess-email] {
   border-color: #fff !important;
-  background: linear-gradient(180deg, #e30808 0%, #c00000 55%, #7a0202 100%) !important;
-  box-shadow: 0 12px 24px -14px rgba(178, 24, 28, 0.65);
+  background-color: #b50000 !important;
+  background-image: linear-gradient(rgb(0, 0, 0) 0%, rgb(204, 0, 0) 100%) !important;
   color: #fff !important;
-  font-style: italic !important;
+  box-shadow: 0 10px 24px -12px rgba(178, 24, 28, 0.9) !important;
 }
 
-body.agfx-facelift .agfx-button--secondary[data-assess-email]:hover {
+body.agfx-facelift .agfx-assess [data-assess-email]:hover,
+body.agfx-facelift .agfx-assess [data-assess-email]:focus-visible {
   border-color: #fff !important;
-  background: linear-gradient(180deg, #ef1a1a 0%, #d00000 55%, #8a0303 100%) !important;
+  background-color: #8f0000 !important;
+  background-image: linear-gradient(rgb(35, 0, 0) 0%, rgb(179, 0, 0) 100%) !important;
   color: #fff !important;
 }
 
@@ -2718,6 +2760,9 @@ body.agfx-facelift .agfx-assess__option:hover {
   transform: translateX(4px);
 }
 
+/* Two columns since the 2026-09-07 CRM intake round took the gate from three
+   fields to eight; one narrow column would have made it a scroll. Ported from
+   Corban's review-repo commit 2af557a. */
 body.agfx-facelift .agfx-assess__form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2729,6 +2774,8 @@ body.agfx-facelift .agfx-assess__form input,
 body.agfx-facelift .agfx-assess__form select,
 body.agfx-facelift .agfx-assess__form textarea {
   width: 100%;
+  /* Grid items default to min-content, so a long <option> would otherwise
+     blow the column out past the overlay. */
   min-width: 0;
   padding: 0.9rem 1rem;
   border: 1.5px solid var(--agfx-rule);
@@ -2739,6 +2786,12 @@ body.agfx-facelift .agfx-assess__form textarea {
   line-height: 1.35;
 }
 
+/* The selects span both columns. In a 266px half-column every one of their
+   labels clipped — "I am evaluating Arc Guard a…", "Primary compliance
+   conce…" — and a native <select> CLIPS rather than overflowing, so the
+   overflow metrics stayed green while the control was unreadable. Full width
+   also removes the lone odd select stranding a gap on the third row. */
+body.agfx-facelift .agfx-assess__form select,
 body.agfx-facelift .agfx-assess__form textarea,
 body.agfx-facelift .agfx-assess__form .agfx-button,
 body.agfx-facelift .agfx-assess__error {
@@ -2749,6 +2802,8 @@ body.agfx-facelift .agfx-assess__form textarea {
   resize: vertical;
 }
 
+/* The placeholder IS the label on this form, so it has to clear 4.5:1 on
+   white rather than sit at the UA's grey. This measures 8.9:1. */
 body.agfx-facelift .agfx-assess__form ::placeholder {
   color: rgba(17, 16, 15, 0.68);
   opacity: 1;
@@ -3152,11 +3207,6 @@ body.agfx-facelift .agfx-compliance__disclaimer {
 }
 
 @media (max-width: 767px) {
-  body.agfx-facelift .agfx-assess__form {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
-
   body.agfx-facelift .agfx-compliance__detail {
     grid-template-columns: 1fr;
   }
@@ -3284,6 +3334,12 @@ body.agfx-facelift .sydney-offcanvas-menu .agfx-offcanvas-consult {
   display: block;
   margin: 0.9rem 1.1rem;
   text-align: center;
+}
+
+/* The off-canvas FAQ clone inherits the desktop CTA's 18px left offset.
+   Remove it so the button edges align with the menu items above. */
+body.agfx-facelift .sydney-offcanvas-menu #primary-menu > li.agfx-nav-faq-btn {
+  margin-left: 0 !important;
 }
 
 /* Sub-pixel seams between adjacent top-level sections let the page base show
@@ -3557,6 +3613,15 @@ body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e {
   padding-bottom: clamp(2.5rem, 4.5vw, 4rem) !important;
 }
 
+/* Elementor leaves an implicit empty second grid row after the three cards,
+   producing hundreds of pixels of cream with no content before Oil & Gas. */
+body.agfx-facelift.agfx-page-industries .elementor-element-86aa59e > .e-con-inner {
+  grid-template-rows: minmax(0, auto) !important;
+  grid-auto-rows: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
 body.agfx-facelift.agfx-page-industries :where(
   .elementor-element-d4e4f07,
   .elementor-element-748a353,
@@ -3784,6 +3849,7 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b {
   padding-top: clamp(1.575rem, 2.925vw, 2.475rem) !important;
   padding-bottom: clamp(1.575rem, 2.925vw, 2.475rem) !important;
+  margin-top: 0 !important;
 }
 
 /* 2026-08-01 visual hardening: Elementor's generated container variables can
@@ -3869,16 +3935,11 @@ body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 
   background-image: linear-gradient(var(--agfx-ink), var(--agfx-ink)) !important;
 }
 
+/* The section itself owns the dark paint. A redundant full-cover pseudo-layer
+   produced a 56px black corner beyond the Mission seam in mobile Safari. */
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
-  background: var(--agfx-ink) !important;
-  pointer-events: none;
+  content: none !important;
+  display: none !important;
 }
 
 body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-2d3ac6a2 > * {
@@ -4494,4 +4555,93 @@ body.agfx-facelift.agfx-page-about .elementor-element-adce7d2 h3 {
 
 body.agfx-facelift.agfx-page-about :where(.elementor-element-762c5d8, .elementor-element-adce7d2) h3::after {
   margin-inline: auto !important;
+}
+
+/* Host-independent final guard for the client-approved Story CTA. */
+body.agfx-facelift.agfx-page-about .elementor-14346 .elementor-element-44900d0b .elementor-button {
+  background-color: #c00000 !important;
+  background-image: linear-gradient(rgb(227, 8, 8) 0%, rgb(192, 0, 0) 55%, rgb(122, 2, 2) 100%) !important;
+  color: #fff !important;
+}
+
+/* HOME — "THE PROBLEM" red rule: close the 1px step at the column boundary.
+   The right-hand card of the first row (fe2a038) carries a native Elementor
+   `margin: -1px` on all four sides. The negative TOP margin lifted it a pixel
+   above its sibling, so its half of the shared 2px red border-top drew one row
+   higher — reading as a break in the middle of the line, exactly as the client
+   reported. Its siblings all use margin 0 and sit flush with no horizontal
+   seam, so matching them is the fix; nothing depended on the negative inline
+   margins. Measured in real Chrome: tops 114.578 vs 115.578 before, equal after. */
+body.agfx-facelift.agfx-page-home .elementor-element-c4d87b7 .elementor-element-fe2a038 {
+  margin: 0 !important;
+}
+
+/* HOME CTA BAND — kill the staircase in the left column. Native Elementor
+   margins left the three elements on three different left edges at >=1280:
+   heading 110 (margin-left 20px), paragraph 93 (margin 3px), button 75
+   (margin-left -15px) against a column starting at 80 — so the button hung 5px
+   OUTSIDE its own column. The right column was already flush at 750/750/750.
+   Also zero the stray 8.84px top margin that left the two buttons 5px out of
+   vertical alignment. Same stray-native-margin family as the red-rule step. */
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .elementor-widget {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 .elementor-widget-button {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 767px) {
+  /* COMPLIANCE CAROUSEL — take the arrows off the cards. They were
+     position:absolute over the track with a 55%-black scrim, covering ~69px of
+     each adjacent card's code and title. Since the 2026-08-21 reorder this is
+     the second thing a phone visitor sees, so the overlap is far more exposed.
+     Lay the track full width, then the arrows centred beneath it. 44px also
+     brings them up to an accessible tap target. */
+  body.agfx-facelift .agfx-compliance__rail {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+  }
+
+  body.agfx-facelift .agfx-compliance__track {
+    order: 1 !important;
+    flex: 1 0 100% !important;
+    width: 100% !important;
+  }
+
+  body.agfx-facelift .agfx-compliance__arrow {
+    order: 2 !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+/* The staircase above lives on the Elementor ATOMIC elements, not the widget
+   wrappers: h3.e-heading-base carries margin-left:20px and p.e-paragraph-base
+   carries margin-left:3px, so zeroing .elementor-widget margins alone left the
+   column edges at 110/93/90. Flatten the atomics too. */
+body.agfx-facelift.agfx-page-home .elementor-element-ffcb8a8 :is(.e-heading-base, .e-paragraph-base) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* ==========================================================================
+   CRM INTAKE FORM — 2026-09-07 (client, via Corban)
+   The assessment gate grew from 3 fields to 8. Below 767px two columns put
+   the selects at ~150px, which truncates every option label, so collapse to
+   one. Physical EOF so nothing later in the cascade can re-widen it.
+   ========================================================================== */
+@media (max-width: 767px) {
+  body.agfx-facelift .agfx-assess__form {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+  }
 }
