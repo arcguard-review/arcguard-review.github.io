@@ -519,15 +519,15 @@
             </select>
             <select name="primary_compliance_concern">
               <option value="">Primary compliance concern</option>
-              <!-- Corban staged this option as "Arc flash prevention". "Arc
-                   flash" is electrical-industry positioning the owners
-                   explicitly rejected on the 2026-07-16 Zoom, and it is in the
-                   forbidden-phrase content gate, so shipping it verbatim would
-                   have put a banned phrase in the live intake. Chris chose the
-                   welding-side replacement 2026-09-08. "Unintentional arc" is
-                   the owners' own wording — presentation.txt and ag1-booklet.txt
-                   both read "unintentional arcs that can damage equipment".
-                   Corban must mirror this value in the sheet's validation. -->
+              <!-- Corban staged this option using the electrical-industry
+                   positioning the owners explicitly rejected on the 2026-07-16
+                   Zoom (it is in the forbidden-phrase content gate), so
+                   shipping it verbatim would have put a banned phrase in the
+                   live intake. Chris chose the welding-side replacement on
+                   2026-09-08. "Unintentional arc" is the owners' own wording —
+                   presentation.txt and ag1-booklet.txt both read "unintentional
+                   arcs that can damage equipment". Corban must mirror this
+                   exact value in the sheet's column validation. -->
               <option>Unintentional arc prevention</option>
               <option>Dropped object prevention</option>
               <option>Welding lead connector safety</option>
