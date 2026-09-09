@@ -392,6 +392,36 @@
     } catch {}
   };
 
+  // ---- Analytics surfaces. Client instruction 2026-09-08 (Corban): the live
+  // site must fire a named event for each reporting surface so monthly
+  // reporting can cover assessment interest, submissions, consult intent,
+  // FAQ/standards interest and qualified lead flow.
+  //
+  // Delegated on the document in the CAPTURE phase, deliberately:
+  //   - capture runs before any handler that calls preventDefault or navigates,
+  //     so the beacon is queued even when the click leaves the page;
+  //   - delegation covers links that do not exist at bind time — the offcanvas
+  //     FAQ clone, the mobile FAQ pill, the scorecard CTAs inside the overlay —
+  //     and native Elementor links the facelift never touches.
+  // Order matters: [data-assess-email] is a mailto and must be classified
+  // before the generic href tests.
+  const bindAnalyticsClicks = () => {
+    document.addEventListener('click', event => {
+      const el = event.target?.closest?.('a, button');
+      if (!el) return;
+      const href = el.getAttribute('href') || '';
+      if (el.matches('[data-assess-email]')) {
+        trackEvent('scorecard_email_click', { method: 'compliance_assessment' });
+      } else if (/calendly\.com/i.test(href)) {
+        trackEvent('schedule_consult_click', { link_url: href });
+      } else if (/ArcGuard_Compliance_Standards/i.test(href)) {
+        trackEvent('standards_sheet_click', { link_url: href });
+      } else if (/ArcGuard_FAQ/i.test(href) || el.closest('.agfx-nav-faq, .agfx-mobile-faq')) {
+        trackEvent('faq_click', { link_url: href });
+      }
+    }, true);
+  };
+
   // Corban's commit 2af557a. `form.elements[name]` rather than `form[name]`:
   // the gate form now has a field literally named `name`, and `form.name` is
   // the form element's own name property, not the input.
@@ -747,6 +777,14 @@
       // down, and the localStorage stash above is the local record either way.
       submitLeadToCrm(payload);
       // GA4 key event for conversion-rate tracking (no PII sent).
+      // Both are key events for Corban's GA4 reporting. assessment_submit
+      // counts completed self-checks; generate_lead is the qualified-lead
+      // conversion. They fire together here but are reported separately.
+      trackEvent('assessment_submit', {
+        method: 'compliance_assessment',
+        assessment_score: score(),
+        assessment_tier: payload.assessment_tier
+      });
       trackEvent('generate_lead', { method: 'compliance_assessment', assessment_score: score() });
       renderResults();
     });
@@ -793,13 +831,23 @@
         first.focus();
       }
     });
-    overlay.querySelector('.agfx-assess__start').addEventListener('click', () => { show('quiz'); renderQuestion(); });
+    overlay.querySelector('.agfx-assess__start').addEventListener('click', () => {
+      // Distinct from assessment_open: opening the overlay is interest,
+      // starting the quiz is commitment. Corban reports on both.
+      trackEvent('assessment_start', { method: 'compliance_assessment' });
+      show('quiz');
+      renderQuestion();
+    });
 
     const bindTriggers = () => {
       for (const anchor of document.querySelectorAll('a[href*="#compliance-check"]')) {
         anchor.addEventListener('click', event => {
           const url = new URL(anchor.href, window.location.href);
-          if (url.pathname === window.location.pathname) { event.preventDefault(); open(anchor); }
+          if (url.pathname === window.location.pathname) {
+            event.preventDefault();
+            trackEvent('assessment_cta_click', { link_text: (anchor.textContent || '').trim().slice(0, 60) });
+            open(anchor);
+          }
         });
       }
     };
@@ -1460,6 +1508,9 @@
   improveLinksAndActions();
   updateContactPage();
   retargetFaqDocumentLinks();
+  // After retargetFaqDocumentLinks so the FAQ/standards hrefs are already the
+  // final ones; delegation means later-injected links are covered regardless.
+  bindAnalyticsClicks();
   injectFaqAccess();
   injectComplianceSection();
   injectAssessment();
