@@ -403,6 +403,12 @@
     buy.style.transform = `translateX(${offset}px)`;
   };
 
+  const scheduleHeaderBuyNowAlignment = () => {
+    requestAnimationFrame(() => requestAnimationFrame(alignHeaderBuyNow));
+    window.setTimeout(alignHeaderBuyNow, 250);
+    window.setTimeout(alignHeaderBuyNow, 1000);
+  };
+
   // ---- Compliance assessment (restored 2026-07-21 at the client's request:
   // "add back the compliance assessment"). Concept approved on the recorded
   // 7/16 Zoom (Marco: "So you think you're compliant? See how you stack up";
@@ -1581,7 +1587,7 @@
   bindAnalyticsClicks();
   injectFaqAccess();
   injectBuyNowAccess();
-  requestAnimationFrame(alignHeaderBuyNow);
+  scheduleHeaderBuyNowAlignment();
   injectComplianceSection();
   injectAssessment();
   enhanceFooter();
@@ -1600,9 +1606,10 @@
       sourceInventory = mediaInventory();
       window.__AGFX_AUDIT.sourceInventory = sourceInventory;
       updateAudit();
+      scheduleHeaderBuyNowAlignment();
     },
     { once: true }
   );
   window.addEventListener('resize', updateAudit, { passive: true });
-  window.addEventListener('resize', alignHeaderBuyNow, { passive: true });
+  window.addEventListener('resize', scheduleHeaderBuyNowAlignment, { passive: true });
 })();
