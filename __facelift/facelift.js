@@ -373,6 +373,36 @@
     else productButtonStack?.append(wrap);
   };
 
+  const alignHeaderBuyNow = () => {
+    const buy = document.querySelector('#primary-menu > li.agfx-nav-buy-btn > a');
+    const home = [...document.querySelectorAll('#primary-menu > li > a')]
+      .find(anchor => /^home$/i.test((anchor.textContent || '').trim()));
+    if (!buy || !home) return;
+
+    buy.style.transform = '';
+    const visibleRect = element => {
+      const rect = element?.getBoundingClientRect();
+      const style = element ? getComputedStyle(element) : null;
+      if (!rect || rect.width <= 1 || rect.height <= 1 || style?.visibility === 'hidden' || style?.display === 'none') return null;
+      return rect;
+    };
+    const socialRects = [...document.querySelectorAll('header a[href*="facebook"], header a[href*="linkedin"]')]
+      .map(visibleRect)
+      .filter(Boolean);
+    const homeRect = visibleRect(home);
+    const buyRect = visibleRect(buy);
+    if (!socialRects.length || !homeRect || !buyRect) return;
+
+    const socialRight = Math.max(...socialRects.map(rect => rect.right));
+    const available = homeRect.left - socialRight;
+    if (available <= buyRect.width + 24) return;
+
+    const desiredCenter = socialRight + available / 2;
+    const currentCenter = buyRect.left + buyRect.width / 2;
+    const offset = Math.max(-220, Math.min(80, Math.round(desiredCenter - currentCenter)));
+    buy.style.transform = `translateX(${offset}px)`;
+  };
+
   // ---- Compliance assessment (restored 2026-07-21 at the client's request:
   // "add back the compliance assessment"). Concept approved on the recorded
   // 7/16 Zoom (Marco: "So you think you're compliant? See how you stack up";
@@ -1551,6 +1581,7 @@
   bindAnalyticsClicks();
   injectFaqAccess();
   injectBuyNowAccess();
+  requestAnimationFrame(alignHeaderBuyNow);
   injectComplianceSection();
   injectAssessment();
   enhanceFooter();
@@ -1573,4 +1604,5 @@
     { once: true }
   );
   window.addEventListener('resize', updateAudit, { passive: true });
+  window.addEventListener('resize', alignHeaderBuyNow, { passive: true });
 })();
