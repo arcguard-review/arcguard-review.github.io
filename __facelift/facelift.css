@@ -2993,6 +2993,20 @@ body.agfx-facelift #primary-menu > li.agfx-nav-faq-btn {
   margin-left: 18px;
 }
 
+body.agfx-facelift #primary-menu > li.agfx-nav-buy-btn {
+  display: flex;
+  align-items: center;
+  margin-right: 18px !important;
+}
+
+body.agfx-facelift #primary-menu > li.agfx-nav-buy-btn > a {
+  min-height: 40px;
+  padding: 0.68rem 1.25rem !important;
+  font-size: 1rem !important;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 body.agfx-facelift #primary-menu > li.agfx-nav-faq-btn > a {
   padding: 0.7rem 1.5rem !important;
   border: 1px solid #fff;
@@ -3009,6 +3023,19 @@ body.agfx-facelift #primary-menu > li.agfx-nav-faq-btn > a {
 body.agfx-facelift #primary-menu > li.agfx-nav-faq-btn > a:hover {
   filter: brightness(1.12);
   color: #fff !important;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 .agfx-product-buy-now-wrap {
+  width: min(100%, 420px) !important;
+  max-width: 420px !important;
+  margin-top: 0.05rem;
+}
+
+body.agfx-facelift.agfx-page-product .elementor-element-6d3a201 .agfx-product-buy-now {
+  width: 100%;
+  min-height: 48px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 /* ===== Regulatory Compliance section (home) — content verbatim from Arc

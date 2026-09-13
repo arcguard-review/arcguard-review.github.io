@@ -273,6 +273,7 @@
   const FAQ_PDF = ON_PRODUCTION
     ? 'https://www.arcguardinc.com/wp-content/uploads/2026/06/ArcGuard_FAQ-3.pdf'
     : siteHref('/docs/ArcGuard_FAQ_Patented.pdf');
+  const BUY_NOW_URL = 'https://www.delmarsafetysolutions.com/products/2060410';
 
   const retargetFaqDocumentLinks = () => {
     if (ON_PRODUCTION) return;
@@ -335,6 +336,41 @@
       item.innerHTML = `<a class="agfx-button agfx-offcanvas-consult" href="${CALENDLY_URL}">Schedule a Consult</a>`;
       menu.prepend(item);
     }
+  };
+
+  const makeBuyNowLink = className => {
+    const link = document.createElement('a');
+    link.className = `agfx-button agfx-buy-now ${className || ''}`.trim();
+    link.href = BUY_NOW_URL;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'BUY NOW';
+    link.setAttribute('aria-label', 'Buy Arc Guard from Del Mar Safety Solutions');
+    return link;
+  };
+
+  const injectBuyNowAccess = () => {
+    const primaryMenu = document.querySelector('ul#primary-menu');
+    if (primaryMenu && !primaryMenu.querySelector('.agfx-nav-buy')) {
+      const firstItem = [...primaryMenu.children].find(li => li.tagName === 'LI' && li.querySelector('a[href]'));
+      const item = document.createElement('li');
+      item.className = 'menu-item agfx-nav-buy agfx-nav-buy-btn';
+      item.append(makeBuyNowLink('button agfx-header-buy-now'));
+      if (firstItem) primaryMenu.insertBefore(item, firstItem);
+      else primaryMenu.prepend(item);
+    }
+
+    if (pageKey !== 'product' || document.querySelector('.agfx-product-buy-now-wrap')) return;
+    const standardsLink = [...document.querySelectorAll('a[href], button')]
+      .find(el => /Compliance Standards Reference Sheet/i.test(el.textContent || ''));
+    const productButtonStack = document.querySelector('.elementor-element-6d3a201');
+    const anchorWidget = standardsLink?.closest('.elementor-widget-button, .elementor-element');
+    const wrap = document.createElement('div');
+    wrap.className = 'elementor-widget-button agfx-product-buy-now-wrap';
+    wrap.append(makeBuyNowLink('agfx-product-buy-now'));
+
+    if (anchorWidget && productButtonStack?.contains(anchorWidget)) anchorWidget.after(wrap);
+    else productButtonStack?.append(wrap);
   };
 
   // ---- Compliance assessment (restored 2026-07-21 at the client's request:
@@ -418,6 +454,8 @@
         trackEvent('standards_sheet_click', { link_url: href });
       } else if (/ArcGuard_FAQ/i.test(href) || el.closest('.agfx-nav-faq, .agfx-mobile-faq')) {
         trackEvent('faq_click', { link_url: href });
+      } else if (/delmarsafetysolutions\.com\/products\/2060410/i.test(href)) {
+        trackEvent('buy_now_click', { link_url: href });
       }
     }, true);
   };
@@ -1512,6 +1550,7 @@
   // final ones; delegation means later-injected links are covered regardless.
   bindAnalyticsClicks();
   injectFaqAccess();
+  injectBuyNowAccess();
   injectComplianceSection();
   injectAssessment();
   enhanceFooter();
