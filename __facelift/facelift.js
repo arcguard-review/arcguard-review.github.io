@@ -273,6 +273,13 @@
   const FAQ_PDF = ON_PRODUCTION
     ? 'https://www.arcguardinc.com/wp-content/uploads/2026/06/ArcGuard_FAQ-3.pdf'
     : siteHref('/docs/ArcGuard_FAQ_Patented.pdf');
+
+  // Owner instruction 2026-09-12 (Marco Moran, cc Justin): a red BUY NOW
+  // button in two places, opening the Del Mar product page in a new tab "so
+  // they can continue browsing our website while looking at the product
+  // price". Needed live for the Indianapolis trade show, Monday 2026-09-14.
+  // Copy is the owner's own ("BUY NOW"). Ported from Corban's review commit
+  // 06bbbf4 with placement and style corrected to Marco's marked screenshots.
   const BUY_NOW_URL = 'https://www.delmarsafetysolutions.com/products/2060410';
 
   const retargetFaqDocumentLinks = () => {
@@ -340,76 +347,58 @@
 
   const makeBuyNowLink = className => {
     const link = document.createElement('a');
-    link.className = `agfx-button agfx-buy-now ${className || ''}`.trim();
+    link.className = `agfx-buy-now ${className || ''}`.trim();
     link.href = BUY_NOW_URL;
+    // "on a separate page so they can continue browsing our website".
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = 'BUY NOW';
-    link.setAttribute('aria-label', 'Buy Arc Guard from Del Mar Safety Solutions');
     return link;
   };
 
   const injectBuyNowAccess = () => {
-    const primaryMenu = document.querySelector('ul#primary-menu');
-    if (primaryMenu && !primaryMenu.querySelector('.agfx-nav-buy')) {
-      const firstItem = [...primaryMenu.children].find(li => li.tagName === 'LI' && li.querySelector('a[href]'));
+    // 1. Top banner. Marco's mark is the empty black band between the social
+    //    icons and "Home". The nav <ul> is shrink-wrapped and right-aligned in
+    //    its column, so a list item alone can only ever hug "Home"; the CSS
+    //    makes the list span its column and gives this item auto side margins
+    //    so it centres in the column's free space. A flex sibling BETWEEN the
+    //    header columns would hit the exact Facebook→Home midpoint, but it
+    //    squeezes column 1 and shrinks the logo — desktop logo sizing is a
+    //    thing the client explicitly likes, so the column stays untouched.
+    //    The offcanvas phone menu is a separate copy of this list, so inject
+    //    into every menu the FAQ item goes into, not just the first.
+    const menus = document.querySelectorAll(
+      'ul#primary-menu, .sydney-offcanvas-menu ul.menu, .sydney-offcanvas-menu ul.sydney-dropdown-ul'
+    );
+    for (const menu of menus) {
+      if (menu.closest('li') || menu.querySelector('.agfx-nav-buy')) continue;
       const item = document.createElement('li');
       item.className = 'menu-item agfx-nav-buy agfx-nav-buy-btn';
-      item.append(makeBuyNowLink('button agfx-header-buy-now'));
-      if (firstItem) primaryMenu.insertBefore(item, firstItem);
-      else primaryMenu.prepend(item);
+      item.append(makeBuyNowLink('agfx-header-buy-now'));
+      menu.prepend(item);
     }
 
+    // 2. Mobile header row, beside the FAQ pill, so a phone visitor scanning a
+    //    trade-show QR code reaches the purchase page without opening a menu.
+    //    Same treatment as the FAQ pill; collapses to one column below 360px
+    //    in CSS so the logo keeps its room.
+    const mobileColumn = document.querySelector('.shfb-header.shfb-mobile .shfb-main_header_row .shfb-column-3');
+    if (mobileColumn && !mobileColumn.querySelector('.agfx-mobile-buy')) {
+      mobileColumn.prepend(makeBuyNowLink('agfx-mobile-buy'));
+    }
+
+    // 3. Product page: directly below the Compliance Standards Reference
+    //    Sheet button (Marco's red square). Sits in the same document-button
+    //    stack so it inherits that stack's centring at every width.
     if (pageKey !== 'product' || document.querySelector('.agfx-product-buy-now-wrap')) return;
-    const standardsLink = [...document.querySelectorAll('a[href], button')]
+    const standardsLink = [...document.querySelectorAll('a[href]')]
       .find(el => /Compliance Standards Reference Sheet/i.test(el.textContent || ''));
-    const productButtonStack = document.querySelector('.elementor-element-6d3a201');
-    const anchorWidget = standardsLink?.closest('.elementor-widget-button, .elementor-element');
+    const anchorWidget = standardsLink?.closest('.elementor-widget-button, .elementor-widget');
+    if (!anchorWidget) return;
     const wrap = document.createElement('div');
-    wrap.className = 'elementor-widget-button agfx-product-buy-now-wrap';
-    wrap.append(makeBuyNowLink('agfx-product-buy-now'));
-
-    if (anchorWidget && productButtonStack?.contains(anchorWidget)) anchorWidget.after(wrap);
-    else productButtonStack?.append(wrap);
-  };
-
-  const alignHeaderBuyNow = () => {
-    const buy = document.querySelector('#primary-menu > li.agfx-nav-buy-btn > a');
-    const buyItem = buy?.closest('li');
-    const home = [...document.querySelectorAll('#primary-menu > li > a')]
-      .find(anchor => /^home$/i.test((anchor.textContent || '').trim()));
-    if (!buy || !buyItem || !home) return;
-
-    const visibleRect = element => {
-      const rect = element?.getBoundingClientRect();
-      const style = element ? getComputedStyle(element) : null;
-      if (!rect || rect.width <= 1 || rect.height <= 1 || style?.visibility === 'hidden' || style?.display === 'none') return null;
-      return rect;
-    };
-    const socialRects = [...document.querySelectorAll('header a[href*="facebook"], header a[href*="linkedin"]')]
-      .map(visibleRect)
-      .filter(Boolean);
-    const homeRect = visibleRect(home);
-    const buyItemRect = visibleRect(buyItem);
-    if (!socialRects.length || !homeRect || !buyItemRect) return;
-
-    const socialRight = Math.max(...socialRects.map(rect => rect.right));
-    const available = homeRect.left - socialRight;
-    if (available <= buyItemRect.width + 24) {
-      buy.style.transform = '';
-      return;
-    }
-
-    const desiredCenter = socialRight + available / 2;
-    const currentCenter = buyItemRect.left + buyItemRect.width / 2;
-    const offset = Math.max(-220, Math.min(80, Math.round(desiredCenter - currentCenter)));
-    buy.style.transform = `translateX(${offset}px)`;
-  };
-
-  const scheduleHeaderBuyNowAlignment = () => {
-    requestAnimationFrame(() => requestAnimationFrame(alignHeaderBuyNow));
-    window.setTimeout(alignHeaderBuyNow, 250);
-    window.setTimeout(alignHeaderBuyNow, 1000);
+    wrap.className = 'elementor-widget agfx-product-buy-now-wrap';
+    wrap.append(makeBuyNowLink('agfx-button agfx-product-buy-now'));
+    anchorWidget.after(wrap);
   };
 
   // ---- Compliance assessment (restored 2026-07-21 at the client's request:
@@ -493,7 +482,8 @@
         trackEvent('standards_sheet_click', { link_url: href });
       } else if (/ArcGuard_FAQ/i.test(href) || el.closest('.agfx-nav-faq, .agfx-mobile-faq')) {
         trackEvent('faq_click', { link_url: href });
-      } else if (/delmarsafetysolutions\.com\/products\/2060410/i.test(href)) {
+      } else if (/delmarsafetysolutions\.com/i.test(href)) {
+        // Corban's addition (06bbbf4): purchase intent for the reporting set.
         trackEvent('buy_now_click', { link_url: href });
       }
     }, true);
@@ -1590,7 +1580,6 @@
   bindAnalyticsClicks();
   injectFaqAccess();
   injectBuyNowAccess();
-  scheduleHeaderBuyNowAlignment();
   injectComplianceSection();
   injectAssessment();
   enhanceFooter();
@@ -1609,10 +1598,8 @@
       sourceInventory = mediaInventory();
       window.__AGFX_AUDIT.sourceInventory = sourceInventory;
       updateAudit();
-      scheduleHeaderBuyNowAlignment();
     },
     { once: true }
   );
   window.addEventListener('resize', updateAudit, { passive: true });
-  window.addEventListener('resize', scheduleHeaderBuyNowAlignment, { passive: true });
 })();
