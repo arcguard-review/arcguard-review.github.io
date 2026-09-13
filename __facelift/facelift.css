@@ -4808,6 +4808,12 @@ body.agfx-facelift.agfx-page-product .agfx-product-buy-now-wrap {
   padding: 0 !important;
 }
 
+/* Finish copied from the two document buttons it sits beneath — measured in
+   real Chrome on production: the bright red→dark red gradient, 2px tracking,
+   14.08px, the same soft red drop shadow. The header BUY NOW uses the
+   black→red gradient because THAT is what sits next to it (FAQ). "Match our
+   existing color scheme" means match the neighbours; a black-topped button
+   under two bright red ones read as a different family. */
 body.agfx-facelift.agfx-page-product a.agfx-product-buy-now {
   display: inline-flex !important;
   align-items: center !important;
@@ -4817,12 +4823,14 @@ body.agfx-facelift.agfx-page-product a.agfx-product-buy-now {
   padding: 0.8rem 1.5rem !important;
   border: 1px solid #fff !important;
   border-radius: 3px !important;
-  background-color: #b50000 !important;
-  background-image: linear-gradient(rgb(0, 0, 0) 0%, rgb(204, 0, 0) 100%) !important;
+  background-color: #c00000 !important;
+  background-image: linear-gradient(rgb(227, 8, 8) 0%, rgb(192, 0, 0) 55%, rgb(122, 2, 2) 100%) !important;
+  box-shadow: rgba(178, 24, 28, 0.65) 0px 12px 24px -14px !important;
   color: #fff !important;
+  font-size: 14.08px !important;
   font-style: italic !important;
   font-weight: 620 !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 2px !important;
   text-transform: uppercase !important;
   text-decoration: none !important;
   white-space: nowrap !important;
