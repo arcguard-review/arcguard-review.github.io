@@ -4694,7 +4694,11 @@ body.agfx-facelift #primary-menu > li.agfx-nav-buy-btn > a.agfx-header-buy-now {
   background-color: #b50000 !important;
   background-image: linear-gradient(rgb(0, 0, 0) 0%, rgb(204, 0, 0) 100%) !important;
   color: #fff !important;
-  font-style: italic !important;
+  /* No font-style here on purpose. The FAQ rule declares italic, but the
+     nav rule `a:not(.button) { font-style: normal !important }` outranks it,
+     so the FAQ button the client has approved for weeks renders UPRIGHT.
+     An !important italic here made BUY NOW the only slanted item in the bar.
+     Inherit, and both follow the same rule. */
   font-weight: 700 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
@@ -4710,20 +4714,28 @@ body.agfx-facelift #primary-menu > li.agfx-nav-buy-btn > a.agfx-header-buy-now:f
 
 /* The desktop nav already compresses at 1025–1340px to keep seven items on
    one row; an eighth needs the same treatment or the row wraps. */
+/* Mirror the FAQ band rule exactly: only the inline padding tightens.
+   Shrinking vertical padding and tracking too made BUY NOW 3px shorter than
+   FAQ across 1025–1340 — the only two buttons in the bar, at different
+   heights. */
 @media (min-width: 1025px) and (max-width: 1340px) {
   body.agfx-facelift #primary-menu > li.agfx-nav-buy-btn > a.agfx-header-buy-now {
-    padding: 0.6rem 0.9rem !important;
-    letter-spacing: 0.04em !important;
+    padding-inline: 1rem !important;
   }
 }
 
 /* -- Offcanvas phone menu ------------------------------------------------ */
 /* Same list, cloned into the drawer: render as a full-width button row like
    the consult entry, and drop the desktop auto margins. */
+/* The theme's "×" close sits at (250–280, 52–82) in the open drawer; as the
+   new first item BUY NOW's top-right corner (270, 72) landed under it, so a
+   thumb near that corner closed the menu instead of buying. Caught by the
+   content skeptic's elementFromPoint probe. Clear it with a top margin. */
 body.agfx-facelift .sydney-offcanvas-menu #primary-menu > li.agfx-nav-buy-btn,
-body.agfx-facelift .sydney-offcanvas-menu ul.menu > li.agfx-nav-buy-btn {
+body.agfx-facelift .sydney-offcanvas-menu ul.menu > li.agfx-nav-buy-btn,
+body.agfx-facelift .mobile-offcanvas-menu-content li.agfx-nav-buy-btn {
   display: block !important;
-  margin: 0 0 0.5rem !important;
+  margin: 1.5rem 0 0.5rem !important;
   padding: 0 !important;
 }
 
@@ -4840,4 +4852,13 @@ body.agfx-facelift.agfx-page-product a.agfx-product-buy-now:hover,
 body.agfx-facelift.agfx-page-product a.agfx-product-buy-now:focus-visible {
   filter: brightness(1.12);
   color: #fff !important;
+}
+
+/* Below 1025px Elementor drops the native buttons' 8px/-6px margins, so the
+   stack rhythm becomes the bare 12px row-gap; the 8px top that matched
+   desktop then reads as a looser third button (20px). Follow the neighbours. */
+@media (max-width: 1024px) {
+  body.agfx-facelift.agfx-page-product .agfx-product-buy-now-wrap {
+    margin-top: 0 !important;
+  }
 }
