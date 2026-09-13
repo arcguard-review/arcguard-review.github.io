@@ -375,11 +375,11 @@
 
   const alignHeaderBuyNow = () => {
     const buy = document.querySelector('#primary-menu > li.agfx-nav-buy-btn > a');
+    const buyItem = buy?.closest('li');
     const home = [...document.querySelectorAll('#primary-menu > li > a')]
       .find(anchor => /^home$/i.test((anchor.textContent || '').trim()));
-    if (!buy || !home) return;
+    if (!buy || !buyItem || !home) return;
 
-    buy.style.transform = '';
     const visibleRect = element => {
       const rect = element?.getBoundingClientRect();
       const style = element ? getComputedStyle(element) : null;
@@ -390,15 +390,18 @@
       .map(visibleRect)
       .filter(Boolean);
     const homeRect = visibleRect(home);
-    const buyRect = visibleRect(buy);
-    if (!socialRects.length || !homeRect || !buyRect) return;
+    const buyItemRect = visibleRect(buyItem);
+    if (!socialRects.length || !homeRect || !buyItemRect) return;
 
     const socialRight = Math.max(...socialRects.map(rect => rect.right));
     const available = homeRect.left - socialRight;
-    if (available <= buyRect.width + 24) return;
+    if (available <= buyItemRect.width + 24) {
+      buy.style.transform = '';
+      return;
+    }
 
     const desiredCenter = socialRight + available / 2;
-    const currentCenter = buyRect.left + buyRect.width / 2;
+    const currentCenter = buyItemRect.left + buyItemRect.width / 2;
     const offset = Math.max(-220, Math.min(80, Math.round(desiredCenter - currentCenter)));
     buy.style.transform = `translateX(${offset}px)`;
   };
